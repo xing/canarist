@@ -6,12 +6,12 @@ const os = require('os');
 const path = require('path');
 
 const explorer = require('cosmiconfig')('citgm');
-const gitUrlParse = require('git-url-parse');
 const makeDir = require('make-dir');
 const mergeOptions = require('merge-options');
 const writePkg = require('write-pkg');
 
-const normalizeWorkspaceVersions = require('./normalize-workspace-versions');
+const { normalizeArguments, normalizeConfig } = require('./normalize');
+const normlizeWorkspaces = require('./normalize-workspaces');
 const subarg = require('./subarg-patched');
 
 const argv = subarg(process.argv.slice(2), {
@@ -36,8 +36,6 @@ const config = normalizeConfig(
     : explorer.searchSync().config
 );
 
-makeDir.sync(config.target);
-
 const rootManifestPath = path.join(config.target, 'package.json');
 const rootManifest = mergeOptions.call(
   { concatArrays: true },
@@ -50,63 +48,6 @@ const rootManifest = mergeOptions.call(
   config.rootManifest
 );
 
-function normalizeArguments(argv) {
-  const {
-    _: [target],
-    repository: repositories,
-    'root-manifest': rootManifest,
-  } = argv;
-
-  return {
-    target,
-    rootManifest: JSON.parse(rootManifest || '{}'),
-    repositories: repositories.map(input => {
-      const {
-        _: [repository = input],
-        branch,
-        directory,
-        command: commands,
-      } = input;
-
-      return {
-        repository,
-        branch,
-        commands:
-          commands === true
-            ? ['']
-            : Array.isArray(commands)
-            ? commands
-            : [commands],
-        directory,
-      };
-    }),
-  };
-}
-
-function normalizeConfig(config) {
-  config.target =
-    config.target || fs.mkdtempSync(path.join(os.tmpdir(), 'citgm'));
-
-  config.repositories = config.repositories.map(input => {
-    const { name } = gitUrlParse(input.repository || input);
-    const directoryName =
-      name === '.'
-        ? path.basename(path.resolve(input.repository || input))
-        : name;
-
-    const {
-      repository = input,
-      branch = 'master',
-      commands = ['yarn test'],
-      directory = directoryName,
-    } = input;
-
-    return { repository, directory, branch, commands };
-  });
-
-  return config;
-}
-
 function cloneRepository(repository, directory, branch) {
   child_process.spawnSync(
     'git',
@@ -117,18 +58,10 @@ function cloneRepository(repository, directory, branch) {
   );
 }
 
-function fixManifest(manifestPath, manifest) {
-  if (!manifest.version) {
-    manifest.version = '0.0.0-test';
-    writePkg.sync(manifestPath, manifest);
-  }
-}
-
-function collectWorkspaces(directory, { workspaces }) {
-  return [
-    directory,
-    ...workspaces.map(pattern => path.join(directory, pattern)),
-  ];
+if (!config.target) {
+  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'citgm'));
+} else {
+  makeDir.sync(config.target);
 }
 
 config.repositories.forEach(({ repository, directory, branch }) => {
@@ -137,12 +70,18 @@ config.repositories.forEach(({ repository, directory, branch }) => {
   const manifestPath = path.join(config.target, directory, 'package.json');
   const manifest = require(manifestPath);
 
-  fixManifest(manifestPath, manifest);
+  if (!manifest.version) {
+    manifest.version = '0.0.0-test';
+    writePkg.sync(manifestPath, manifest);
+  }
 
-  rootManifest.workspaces.push(...collectWorkspaces(directory, manifest));
+  rootManifest.workspaces.push(
+    directory,
+    ...workspaces.map(pattern => path.join(directory, pattern))
+  );
 });
 
-normalizeWorkspaceVersions(rootManifest.workspaces, true);
+normlizeWorkspaces(rootManifest.workspaces, true);
 
 writePkg.sync(rootManifestPath, rootManifest);
 
