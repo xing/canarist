@@ -12,8 +12,29 @@ const mergeOptions = require('merge-options');
 const writePkg = require('write-pkg');
 
 const normalizeWorkspaceVersions = require('./normalize-workspace-versions');
+const subarg = require('./subarg-patched');
 
-const config = normalizeConfig(explorer.searchSync().config);
+const argv = subarg(process.argv.slice(2), {
+  alias: {
+    help: ['h'],
+    repository: ['r'],
+    branch: ['b'],
+    command: ['c'],
+    directory: ['d'],
+    'root-manifest': ['m'],
+  },
+});
+
+if (argv.help || argv._.includes('help')) {
+  console.log('Usage:', process.argv[1]);
+  process.exit(0);
+}
+
+const config = normalizeConfig(
+  process.argv.length > 2
+    ? normalizeArguments(argv)
+    : explorer.searchSync().config
+);
 
 makeDir.sync(config.target);
 
@@ -28,6 +49,39 @@ const rootManifest = mergeOptions.call(
   },
   config.rootManifest
 );
+
+function normalizeArguments(argv) {
+  const {
+    _: [target],
+    repository: repositories,
+    'root-manifest': rootManifest,
+  } = argv;
+
+  return {
+    target,
+    rootManifest: JSON.parse(rootManifest || '{}'),
+    repositories: repositories.map(input => {
+      const {
+        _: [repository = input],
+        branch,
+        directory,
+        command: commands,
+      } = input;
+
+      return {
+        repository,
+        branch,
+        commands:
+          commands === true
+            ? ['']
+            : Array.isArray(commands)
+            ? commands
+            : [commands],
+        directory,
+      };
+    }),
+  };
+}
 
 function normalizeConfig(config) {
   config.target =
@@ -97,7 +151,7 @@ child_process.spawnSync('yarn', { stdio: 'inherit', cwd: config.target });
 config.repositories.forEach(({ directory, commands }) => {
   commands.forEach(input => {
     const [command, ...args] = input.split(' ');
-    if (command) {
+    if (typeof command === 'string' && command !== '') {
       child_process.spawnSync(command, args, {
         cwd: path.join(config.target, directory),
         stdio: 'inherit',
