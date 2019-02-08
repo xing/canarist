@@ -26,7 +26,39 @@ const argv = subarg(process.argv.slice(2), {
 });
 
 if (argv.help || argv._.includes('help')) {
-  console.log('Usage:', process.argv[1]);
+  console.log(
+    'Usage: citgm options [<target>]',
+    '\n\nOptions:',
+    '\n\t--repository, -r',
+    '\n\t    The URL (or local file path) to a repository to clone.',
+    '\n\t    This option accepts sub-arguments (see examples):',
+    '\n\t        --branch, -b',
+    '\n\t        --command, -c',
+    '\n\t        --directory, -d',
+    '\n\t--root-manifest, -m',
+    '\n\t    A valid JSON string that should be merged into the',
+    '\n\t    generated root manifest.',
+    '\n\nExamples:',
+    "\n\t$ citgm -r git@github.com:xing/hops.git -r [git@github.com:some/other.git -c 'yarn build -p' -c 'yarn test']",
+    '\n\t    Clones xing/hops and some/other into a temporary directory',
+    '\n\t    and executes "yarn test" in xing/hops and "yarn build -p" and "yarn test" in some/other',
+    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -c] -r git@github.com:some/other.git',
+    '\n\t    Clones xing/hops and some/other into a temporary directory.',
+    '\n\t    and executes no command in xing/hops and "yarn test" in some/other.',
+    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -b next] -r git@github.com:some/other.git ~/work/integration-tests',
+    '\n\t    Clones the "next" branch of xing/hops and the master branch of some/other',
+    '\n\t    into the target directory and executes "yarn test" in both.',
+    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -d xing-hops] -r [git@github.com:my/hops.git -d my-hops]',
+    '\n\t    Clones xing/hops into xing-hops and my/hops into my-hops inside a temporary directory.',
+    '\n\n\t$ citgm -r ~/work/hops -r ~/work/other -m \'{"resolutions":{"typescript":"3.2.4"},"devDependencies":{"jest":"23.0.0}}\'',
+    '\n\t    Clones the master branches of both local repositories into a temporary directory',
+    '\n\t    and additionally installs yarn resolutions and a missing dev dependency.',
+    '\n\n\t$ citgm -r ~/work/hops -r ~/work/other -r ~/work/other2 -r ~/work/other3',
+    '\n\t    Clones the master branches of all three local repositories into a temporary directory',
+    '\n\t    and executes "yarn test" for each of them.',
+    '\n'
+  );
+
   process.exit(0);
 }
 
