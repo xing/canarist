@@ -136,10 +136,14 @@ config.repositories.forEach(({ directory, commands }) => {
   commands.forEach((input) => {
     const [command, ...args] = input.split(' ');
     if (typeof command === 'string' && command !== '') {
-      child_process.spawnSync(command, args, {
+      const { status } = child_process.spawnSync(command, args, {
         cwd: path.join(config.target, directory),
         stdio: 'inherit',
       });
+
+      if (status !== 0) {
+        process.exitCode = status;
+      }
     }
   });
 });
