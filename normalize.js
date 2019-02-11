@@ -14,7 +14,7 @@ function normalizeArguments(argv) {
     rootManifest: JSON.parse(rootManifest || '{}'),
     repositories: repositories.map((input) => {
       const {
-        _: [repository = input],
+        _: [repository = input] = [input],
         branch,
         directory,
         command: commands,
