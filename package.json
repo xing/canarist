@@ -1,9 +1,9 @@
 {
-  "name": "citgm",
+  "name": "canarist",
   "version": "1.0.0",
   "main": "index.js",
   "bin": "index.js",
-  "author": "ZauberNerd <zaubernerd@zaubernerd.de>",
+  "author": "Björn Brauer <bjoern.brauer@xing.com>",
   "license": "MIT",
   "dependencies": {
     "cosmiconfig": "^5.0.7",

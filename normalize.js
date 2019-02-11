@@ -35,6 +35,10 @@ function normalizeArguments(argv) {
 module.exports.normalizeArguments = normalizeArguments;
 
 function normalizeConfig(config) {
+  if (!config) {
+    return null;
+  }
+
   config.repositories = config.repositories.map(input => {
     const { name } = gitUrlParse(input.repository || input);
     const directoryName =

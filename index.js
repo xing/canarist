@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const explorer = require('cosmiconfig')('citgm');
+const explorer = require('cosmiconfig')('canarist');
 const makeDir = require('make-dir');
 const mergeOptions = require('merge-options');
 const writePkg = require('write-pkg');
@@ -26,8 +26,41 @@ const argv = subarg(process.argv.slice(2), {
 });
 
 if (argv.help || argv._.includes('help')) {
+  printUsage();
+
+  process.exit(0);
+}
+
+const exploredConfig = explorer.searchSync();
+const config = normalizeConfig(
+  process.argv.length > 2
+    ? normalizeArguments(argv)
+    : exploredConfig
+    ? exploredConfig.config
+    : null
+);
+
+if (!config) {
+  printUsage();
+
+  process.exit(1);
+}
+
+const rootManifestPath = path.join(config.target, 'package.json');
+const rootManifest = mergeOptions.call(
+  { concatArrays: true },
+  {
+    name: 'canarist-root',
+    version: '0.0.0-private',
+    private: true,
+    workspaces: [],
+  },
+  config.rootManifest
+);
+
+function printUsage() {
   console.log(
-    'Usage: citgm options [<target>]',
+    'Usage: canarist options [<target>]',
     '\n\nOptions:',
     '\n\t--repository, -r',
     '\n\t    The URL (or local file path) to a repository to clone.',
@@ -39,46 +72,26 @@ if (argv.help || argv._.includes('help')) {
     '\n\t    A valid JSON string that should be merged into the',
     '\n\t    generated root manifest.',
     '\n\nExamples:',
-    "\n\t$ citgm -r git@github.com:xing/hops.git -r [git@github.com:some/other.git -c 'yarn build -p' -c 'yarn test']",
+    "\n\t$ canarist -r git@github.com:xing/hops.git -r [git@github.com:some/other.git -c 'yarn build -p' -c 'yarn test']",
     '\n\t    Clones xing/hops and some/other into a temporary directory',
     '\n\t    and executes "yarn test" in xing/hops and "yarn build -p" and "yarn test" in some/other',
-    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -c] -r git@github.com:some/other.git',
+    '\n\n\t$ canarist -r [git@github.com:xing/hops.git -c] -r git@github.com:some/other.git',
     '\n\t    Clones xing/hops and some/other into a temporary directory.',
     '\n\t    and executes no command in xing/hops and "yarn test" in some/other.',
-    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -b next] -r git@github.com:some/other.git ~/work/integration-tests',
+    '\n\n\t$ canarist -r [git@github.com:xing/hops.git -b next] -r git@github.com:some/other.git ~/work/integration-tests',
     '\n\t    Clones the "next" branch of xing/hops and the master branch of some/other',
     '\n\t    into the target directory and executes "yarn test" in both.',
-    '\n\n\t$ citgm -r [git@github.com:xing/hops.git -d xing-hops] -r [git@github.com:my/hops.git -d my-hops]',
+    '\n\n\t$ canarist -r [git@github.com:xing/hops.git -d xing-hops] -r [git@github.com:my/hops.git -d my-hops]',
     '\n\t    Clones xing/hops into xing-hops and my/hops into my-hops inside a temporary directory.',
-    '\n\n\t$ citgm -r ~/work/hops -r ~/work/other -m \'{"resolutions":{"typescript":"3.2.4"},"devDependencies":{"jest":"23.0.0}}\'',
+    '\n\n\t$ canarist -r ~/work/hops -r ~/work/other -m \'{"resolutions":{"typescript":"3.2.4"},"devDependencies":{"jest":"23.0.0}}\'',
     '\n\t    Clones the master branches of both local repositories into a temporary directory',
     '\n\t    and additionally installs yarn resolutions and a missing dev dependency.',
-    '\n\n\t$ citgm -r ~/work/hops -r ~/work/other -r ~/work/other2 -r ~/work/other3',
+    '\n\n\t$ canarist -r ~/work/hops -r ~/work/other -r ~/work/other2 -r ~/work/other3',
     '\n\t    Clones the master branches of all three local repositories into a temporary directory',
     '\n\t    and executes "yarn test" for each of them.',
     '\n'
   );
-
-  process.exit(0);
 }
-
-const config = normalizeConfig(
-  process.argv.length > 2
-    ? normalizeArguments(argv)
-    : explorer.searchSync().config
-);
-
-const rootManifestPath = path.join(config.target, 'package.json');
-const rootManifest = mergeOptions.call(
-  { concatArrays: true },
-  {
-    name: 'citgm-root',
-    version: '0.0.0-private',
-    private: true,
-    workspaces: [],
-  },
-  config.rootManifest
-);
 
 function cloneRepository(repository, directory, branch) {
   child_process.spawnSync(
@@ -91,7 +104,7 @@ function cloneRepository(repository, directory, branch) {
 }
 
 if (!config.target) {
-  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'citgm'));
+  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'canarist'));
 } else {
   makeDir.sync(config.target);
 }
