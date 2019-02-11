@@ -46,6 +46,12 @@ if (!config) {
   process.exit(1);
 }
 
+if (!config.target) {
+  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'canarist'));
+} else {
+  makeDir.sync(config.target);
+}
+
 const rootManifestPath = path.join(config.target, 'package.json');
 const rootManifest = mergeOptions.call(
   { concatArrays: true },
@@ -103,12 +109,6 @@ function cloneRepository(repository, directory, branch) {
   );
 }
 
-if (!config.target) {
-  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'canarist'));
-} else {
-  makeDir.sync(config.target);
-}
-
 config.repositories.forEach(({ repository, directory, branch }) => {
   cloneRepository(repository, path.join(config.target, directory), branch);
 
@@ -122,7 +122,7 @@ config.repositories.forEach(({ repository, directory, branch }) => {
 
   rootManifest.workspaces.push(
     directory,
-    ...workspaces.map((pattern) => path.join(directory, pattern))
+    ...manifest.workspaces.map((pattern) => path.join(directory, pattern))
   );
 });
 
