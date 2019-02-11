@@ -1,3 +1,5 @@
+const path = require('path');
+
 const gitUrlParse = require('git-url-parse');
 
 function normalizeArguments(argv) {
