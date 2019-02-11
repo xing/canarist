@@ -10,7 +10,7 @@ function normalizeArguments(argv) {
   return {
     target,
     rootManifest: JSON.parse(rootManifest || '{}'),
-    repositories: repositories.map(input => {
+    repositories: repositories.map((input) => {
       const {
         _: [repository = input],
         branch,
@@ -39,7 +39,7 @@ function normalizeConfig(config) {
     return null;
   }
 
-  config.repositories = config.repositories.map(input => {
+  config.repositories = config.repositories.map((input) => {
     const { name } = gitUrlParse(input.repository || input);
     const directoryName =
       name === '.'

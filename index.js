@@ -122,7 +122,7 @@ config.repositories.forEach(({ repository, directory, branch }) => {
 
   rootManifest.workspaces.push(
     directory,
-    ...workspaces.map(pattern => path.join(directory, pattern))
+    ...workspaces.map((pattern) => path.join(directory, pattern))
   );
 });
 
@@ -133,7 +133,7 @@ writePkg.sync(rootManifestPath, rootManifest);
 child_process.spawnSync('yarn', { stdio: 'inherit', cwd: config.target });
 
 config.repositories.forEach(({ directory, commands }) => {
-  commands.forEach(input => {
+  commands.forEach((input) => {
     const [command, ...args] = input.split(' ');
     if (typeof command === 'string' && command !== '') {
       child_process.spawnSync(command, args, {

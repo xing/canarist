@@ -5,6 +5,9 @@
   "bin": "index.js",
   "author": "Björn Brauer <bjoern.brauer@xing.com>",
   "license": "MIT",
+  "scripts": {
+    "fmt": "prettier --write '*.js' 'README.md'"
+  },
   "dependencies": {
     "cosmiconfig": "^5.0.7",
     "fast-glob": "^2.2.6",

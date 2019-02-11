@@ -28,8 +28,8 @@ function logMismatch(type, file, name, versions, dependencies) {
 function normalizeWorkspaceVersions(patterns, write = false) {
   const versions = {};
   const manifests = glob
-    .sync(patterns.map(pattern => path.join(pattern, 'package.json')))
-    .map(file => {
+    .sync(patterns.map((pattern) => path.join(pattern, 'package.json')))
+    .map((file) => {
       const manifest = require(path.resolve(file));
 
       versions[manifest.name] = manifest.version;
@@ -41,10 +41,10 @@ function normalizeWorkspaceVersions(patterns, write = false) {
     });
 
   manifests.forEach(({ file, manifest }) => {
-    dependencyTypes.forEach(type => {
+    dependencyTypes.forEach((type) => {
       const dependencies = manifest[type] || {};
 
-      Object.keys(dependencies).forEach(name => {
+      Object.keys(dependencies).forEach((name) => {
         if (!versions[name]) {
           return;
         }
