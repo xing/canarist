@@ -24,11 +24,11 @@ function normalizeArguments(argv) {
         repository,
         branch,
         commands:
-          commands === true
-            ? ['']
+          typeof commands === 'string'
+            ? [commands]
             : Array.isArray(commands)
             ? commands
-            : [commands],
+            : undefined,
         directory,
       };
     }),
