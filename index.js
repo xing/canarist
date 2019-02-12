@@ -100,12 +100,8 @@ function printUsage() {
 }
 
 function cloneRepository(repository, directory, branch) {
-  child_process.spawnSync(
-    'git',
-    ['clone', repository, directory, '--branch', branch, '--depth', '1'],
-    {
-      stdio: 'inherit',
-    }
+  child_process.execSync(
+    `git clone ${repository} ${directory} --branch ${branch} --depth 1`
   );
 }
 
