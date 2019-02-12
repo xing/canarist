@@ -28,7 +28,9 @@ function normalizeArguments(argv) {
             ? [commands]
             : Array.isArray(commands)
             ? commands
-            : undefined,
+            : typeof commands === 'undefined'
+            ? undefined
+            : [''],
         directory,
       };
     }),
