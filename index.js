@@ -118,7 +118,9 @@ config.repositories.forEach(({ repository, directory, branch }) => {
 
   rootManifest.workspaces.push(
     directory,
-    ...manifest.workspaces.map((pattern) => path.join(directory, pattern))
+    ...(manifest.workspaces
+      ? manifest.workspaces.map((pattern) => path.join(directory, pattern))
+      : [])
   );
 });
 
