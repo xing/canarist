@@ -50,7 +50,13 @@ function normalizeWorkspaceVersions(cwd, patterns, write = false) {
         }
 
         if (!semver.satisfies(versions[name], dependencies[name])) {
-          logMismatch(type, file, name, versions, dependencies);
+          logMismatch(
+            type,
+            path.relative(cwd, file),
+            name,
+            versions,
+            dependencies
+          );
           if (require.main === module) {
             process.exitCode = 1;
           }

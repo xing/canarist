@@ -15,6 +15,8 @@ const { normalizeArguments, normalizeConfig } = require('./normalize');
 const normlizeWorkspaces = require('./normalize-workspaces');
 const subarg = require('./subarg-patched');
 
+const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
+
 const argv = subarg(process.argv.slice(2), {
   alias: {
     help: ['h'],
@@ -48,7 +50,7 @@ if (!config) {
 }
 
 if (!config.target) {
-  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'canarist'));
+  config.target = fs.mkdtempSync(path.join(os.tmpdir(), 'canarist-'));
 } else {
   makeDir.sync(config.target);
 }
@@ -56,9 +58,9 @@ if (!config.target) {
 debug('config: %O', config);
 
 console.log(
-  `[canarist] cloning ${config.repositories.length} repositories into ${
-    config.target
-  }`
+  '[canarist] cloning %d repositories into %s',
+  config.repositories.length,
+  config.target
 );
 
 const rootManifestPath = path.join(config.target, 'package.json');
@@ -115,7 +117,17 @@ function cloneRepository(repository, directory, branch) {
     `git clone ${repository} ${directory} --depth 1` +
     (branch ? `--branch ${branch}` : '');
   debug(`command: %s`);
-  child_process.execSync(command, { stdio: 'inherit' });
+  try {
+    child_process.execSync(command, {
+      stdio: isDebug ? 'inherit' : 'pipe',
+    });
+  } catch (error) {
+    console.error(
+      '[canarist] command "%s" failed with "%s"',
+      command,
+      error.stderr.toString('utf-8').trim()
+    );
+  }
 }
 
 config.repositories.forEach(({ repository, directory, branch }) => {
@@ -143,37 +155,46 @@ normlizeWorkspaces(config.target, rootManifest.workspaces, true);
 
 writePkg.sync(rootManifestPath, rootManifest);
 
-child_process.spawnSync('yarn', { stdio: 'inherit', cwd: config.target });
+console.log('[canarist] installing dependencies with yarn');
 
-const testResults = [];
+try {
+  child_process.execSync('yarn', {
+    stdio: isDebug ? 'inherit' : 'pipe',
+    cwd: config.target,
+  });
+} catch (error) {
+  console.error(
+    '[canarist] yarn installation failed with "%s"',
+    error.stderr.toString('utf-8').trim()
+  );
+}
 
 config.repositories.forEach(({ directory, commands }) => {
-  commands.forEach((input) => {
-    const [command, ...args] = input.split(' ');
+  commands.forEach((command) => {
     if (typeof command === 'string' && command !== '') {
-      console.log('[canarist] executing %s in %s', input, directory);
-      const { status } = child_process.spawnSync(command, args, {
-        cwd: path.join(config.target, directory),
-        stdio: 'inherit',
-      });
-
-      if (status !== 0) {
-        process.exitCode = status;
+      console.log('[canarist] executing "%s" in %s', command, directory);
+      try {
+        child_process.execSync(command, {
+          cwd: path.join(config.target, directory),
+          stdio: isDebug ? 'inherit' : 'pipe',
+          env: {
+            ...process.env,
+            TERM: 'dumb',
+          },
+        });
+      } catch (error) {
+        process.exitCode = error.status;
+        console.error('[canarist] command "%s" failed!', command);
+        console.error(error.stderr.toString('utf-8').trim());
       }
     }
   });
-
-  testResults.push([directory, process.exitCode]);
 });
 
-const failedTests = testResults.filter(([_, code]) => code !== 0);
-
-console.log(
-  '[canarist] failed projects %d/%d',
-  failedTests.length,
-  testResults.length
-);
-console.log(
-  '[canarist] failed projects: %O',
-  failedTests.map(([project]) => project)
-);
+if (process.exitCode === 0) {
+  console.log('[canarist] all tests were successful');
+} else {
+  console.error(
+    '[canarist] ERROR! Some tests failed, see above for more details or set environment variable "DEBUG=canarist" and run again'
+  );
+}
