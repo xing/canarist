@@ -122,11 +122,8 @@ function cloneRepository(repository, directory, branch) {
       stdio: isDebug ? 'inherit' : 'pipe',
     });
   } catch (error) {
-    console.error(
-      '[canarist] command "%s" failed with "%s"',
-      command,
-      error.stderr.toString('utf-8').trim()
-    );
+    console.error('[canarist] command "%s" failed!', command);
+    console.error(error.stderr.toString('utf-8').trim());
   }
 }
 
@@ -163,10 +160,8 @@ try {
     cwd: config.target,
   });
 } catch (error) {
-  console.error(
-    '[canarist] yarn installation failed with "%s"',
-    error.stderr.toString('utf-8').trim()
-  );
+  console.error('[canarist] yarn installation failed!');
+  console.error(error.stderr.toString('utf-8').trim());
 }
 
 config.repositories.forEach(({ directory, commands }) => {
