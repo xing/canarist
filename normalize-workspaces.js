@@ -16,7 +16,7 @@ const dependencyTypes = [
 
 function logMismatch(type, file, name, versions, dependencies) {
   console.error(
-    'ERROR! %s mismatch in (%s) the current version of "%s" (%s) does not satisfy range "%s"',
+    '[canarist] WARNING! %s mismatch in (%s) the current version of "%s" (%s) does not satisfy range "%s"',
     type,
     file,
     name,

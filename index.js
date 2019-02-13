@@ -6,6 +6,7 @@ const os = require('os');
 const path = require('path');
 
 const explorer = require('cosmiconfig')('canarist');
+const debug = require('debug')('canarist');
 const makeDir = require('make-dir');
 const mergeOptions = require('merge-options');
 const writePkg = require('write-pkg');
@@ -52,6 +53,14 @@ if (!config.target) {
   makeDir.sync(config.target);
 }
 
+debug('config: %O', config);
+
+console.log(
+  `[canarist] cloning ${config.repositories.length} repositories into ${
+    config.target
+  }`
+);
+
 const rootManifestPath = path.join(config.target, 'package.json');
 const rootManifest = mergeOptions.call(
   { concatArrays: true },
@@ -63,6 +72,8 @@ const rootManifest = mergeOptions.call(
   },
   config.rootManifest
 );
+
+debug('root manifest: %O', rootManifest);
 
 function printUsage() {
   console.log(
@@ -101,6 +112,7 @@ function printUsage() {
 
 function cloneRepository(repository, directory, branch) {
   const command = `git clone ${repository} ${directory} --branch ${branch} --depth 1`;
+  debug(`command: %s`);
   child_process.execSync(command, { stdio: 'inherit' });
 }
 
@@ -123,16 +135,21 @@ config.repositories.forEach(({ repository, directory, branch }) => {
   );
 });
 
+debug('detected workspaces: %O', rootManifest.workspaces);
+
 normlizeWorkspaces(config.target, rootManifest.workspaces, true);
 
 writePkg.sync(rootManifestPath, rootManifest);
 
 child_process.spawnSync('yarn', { stdio: 'inherit', cwd: config.target });
 
+const testResults = [];
+
 config.repositories.forEach(({ directory, commands }) => {
   commands.forEach((input) => {
     const [command, ...args] = input.split(' ');
     if (typeof command === 'string' && command !== '') {
+      console.log('[canarist] executing %s in %s', input, directory);
       const { status } = child_process.spawnSync(command, args, {
         cwd: path.join(config.target, directory),
         stdio: 'inherit',
@@ -143,4 +160,18 @@ config.repositories.forEach(({ directory, commands }) => {
       }
     }
   });
+
+  testResults.push([directory, process.exitCode]);
 });
+
+const failedTests = testResults.filter(([_, code]) => code !== 0);
+
+console.log(
+  '[canarist] failed projects %d/%d',
+  failedTests.length,
+  testResults.length
+);
+console.log(
+  '[canarist] failed projects: %O',
+  failedTests.map(([project]) => project)
+);
