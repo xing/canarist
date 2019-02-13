@@ -211,6 +211,12 @@ console.log(
 );
 
 if (failingCommands.length) {
+  console.log(
+    '[canarist] failed commands: %O',
+    failingCommands.map(
+      ({ directory, command }) => `"${command}" in ${directory}`
+    )
+  );
   console.error(
     '[canarist] ERROR! Some tests failed, see above for more details or set environment variable "DEBUG=canarist" and run again'
   );
