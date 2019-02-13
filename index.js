@@ -100,9 +100,8 @@ function printUsage() {
 }
 
 function cloneRepository(repository, directory, branch) {
-  child_process.execSync(
-    `git clone ${repository} ${directory} --branch ${branch} --depth 1`
-  );
+  const command = `git clone ${repository} ${directory} --branch ${branch} --depth 1`;
+  child_process.execSync(command, { stdio: 'inherit' });
 }
 
 config.repositories.forEach(({ repository, directory, branch }) => {
