@@ -122,7 +122,7 @@ config.repositories.forEach(({ repository, directory, branch }) => {
   );
 });
 
-normlizeWorkspaces(rootManifest.workspaces, true);
+normlizeWorkspaces(config.target, rootManifest.workspaces, true);
 
 writePkg.sync(rootManifestPath, rootManifest);
 
