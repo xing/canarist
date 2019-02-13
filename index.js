@@ -164,6 +164,8 @@ try {
   console.error(error.stderr.toString('utf-8').trim());
 }
 
+const failingCommands = [];
+
 config.repositories.forEach(({ directory, commands }) => {
   commands.forEach((command) => {
     if (typeof command === 'string' && command !== '') {
@@ -179,16 +181,36 @@ config.repositories.forEach(({ directory, commands }) => {
         });
       } catch (error) {
         process.exitCode = error.status;
-        console.error('[canarist] command "%s" failed!', command);
-        console.error(error.stderr.toString('utf-8').trim());
+        const stderr = error.stderr.toString('utf-8').trim();
+        failingCommands.push({
+          directory,
+          command,
+          status: error.status,
+          stderr,
+        });
+        console.error(
+          '[canarist] command "%s" failed in %s!',
+          command,
+          directory
+        );
+        console.error(stderr);
       }
     }
   });
 });
 
-if (process.exitCode === 0) {
-  console.log('[canarist] all tests were successful');
-} else {
+const totalCommands = config.repositories.reduce(
+  (total, r) => total + r.commands.filter(Boolean).length,
+  0
+);
+
+console.log(
+  '[canarist] %d out of %d commands finished successfully',
+  totalCommands - failingCommands.length,
+  totalCommands
+);
+
+if (failingCommands.length) {
   console.error(
     '[canarist] ERROR! Some tests failed, see above for more details or set environment variable "DEBUG=canarist" and run again'
   );
