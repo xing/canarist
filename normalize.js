@@ -52,7 +52,7 @@ function normalizeConfig(config) {
 
     const {
       repository = input,
-      branch = 'master',
+      branch = '',
       commands = ['yarn test'],
       directory = directoryName,
     } = input;
