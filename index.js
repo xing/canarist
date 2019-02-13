@@ -114,7 +114,7 @@ function printUsage() {
 
 function cloneRepository(repository, directory, branch) {
   const command =
-    `git clone ${repository} ${directory} --depth 1` +
+    `git clone ${repository} ${directory} --depth 1 ` +
     (branch ? `--branch ${branch}` : '');
   debug(`command: %s`);
   try {
