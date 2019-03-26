@@ -17,7 +17,7 @@
     "make-dir": "^2.0.0",
     "merge-options": "^1.0.1",
     "minimist": "^1.2.0",
-    "semver": "^5.6.0",
+    "semver": "^6.0.0",
     "write-pkg": "^3.2.0"
   },
   "devDependencies": {
