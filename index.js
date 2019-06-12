@@ -71,6 +71,7 @@ const rootManifest = mergeOptions.call(
     version: '0.0.0-private',
     private: true,
     workspaces: [],
+    resolutions: {},
   },
   config.rootManifest
 );
@@ -131,11 +132,33 @@ config.repositories.forEach(({ repository, directory, branch }) => {
   cloneRepository(repository, path.join(config.target, directory), branch);
 
   const manifestPath = path.join(config.target, directory, 'package.json');
+  const npmrcPath = path.join(config.target, directory, '.npmrc');
   const manifest = require(manifestPath);
+
+  if (fs.existsSync(npmrcPath)) {
+    const npmrcContent = fs.readFileSync(npmrcPath);
+    fs.appendFileSync(path.join(config.target, '.npmrc'), npmrcContent + '\n');
+  }
 
   if (!manifest.version) {
     manifest.version = '0.0.0-test';
     writePkg.sync(manifestPath, manifest);
+  }
+
+  if (manifest.resolutions) {
+    Object.entries(manifest.resolutions).forEach(([name, version]) => {
+      if (
+        !rootManifest.resolutions[name] ||
+        rootManifest.resolutions[name] === version
+      ) {
+        rootManifest.resolutions[name] = version;
+      } else {
+        console.error(
+          '[canarist] WARNING! incompatible resolutions found! "%s"',
+          name
+        );
+      }
+    });
   }
 
   rootManifest.workspaces.push(
