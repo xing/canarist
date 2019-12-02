@@ -12,7 +12,7 @@ const mergeOptions = require('merge-options');
 const writePkg = require('write-pkg');
 
 const { normalizeArguments, normalizeConfig } = require('./normalize');
-const normlizeWorkspaces = require('./normalize-workspaces');
+const normalizeWorkspaces = require('./normalize-workspaces');
 const subarg = require('./subarg-patched');
 
 const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
@@ -171,7 +171,7 @@ config.repositories.forEach(({ repository, directory, branch }) => {
 
 debug('detected workspaces: %O', rootManifest.workspaces);
 
-normlizeWorkspaces(config.target, rootManifest.workspaces, true);
+normalizeWorkspaces(config.target, rootManifest.workspaces, true);
 
 writePkg.sync(rootManifestPath, rootManifest);
 
