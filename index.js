@@ -117,7 +117,7 @@ function cloneRepository(repository, directory, branch) {
   const command =
     `git clone ${repository} ${directory} --depth 1 ` +
     (branch ? `--branch ${branch}` : '');
-  debug(`command: %s`);
+  debug(`command: %s`, command);
   try {
     child_process.execSync(command, {
       stdio: isDebug ? 'inherit' : 'pipe',
