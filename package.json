@@ -10,7 +10,7 @@
     "test": "echo 'no tests' && exit 0"
   },
   "dependencies": {
-    "cosmiconfig": "^5.2.1",
+    "cosmiconfig": "^6.0.0",
     "debug": "^4.1.1",
     "fast-glob": "^3.0.0",
     "git-url-parse": "^11.1.2",
