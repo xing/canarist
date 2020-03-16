@@ -15,7 +15,7 @@
     "fast-glob": "^3.0.0",
     "git-url-parse": "^11.1.2",
     "make-dir": "^3.0.0",
-    "merge-options": "^1.0.1",
+    "merge-options": "^2.0.0",
     "minimist": "^1.2.2",
     "semver": "^6.1.1",
     "write-pkg": "^4.0.0"
