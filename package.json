@@ -16,7 +16,7 @@
     "git-url-parse": "^11.1.2",
     "make-dir": "^3.0.0",
     "merge-options": "^1.0.1",
-    "minimist": "^1.2.2",
+    "minimist": "^1.2.3",
     "semver": "^6.1.1",
     "write-pkg": "^4.0.0"
   },
