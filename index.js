@@ -206,19 +206,16 @@ config.repositories.forEach(({ directory, commands }) => {
         });
       } catch (error) {
         process.exitCode = error.status;
-        const stderr = error.stderr.toString('utf-8').trim();
         failingCommands.push({
           directory,
           command,
-          status: error.status,
-          stderr,
         });
         console.error(
           '[canarist] command "%s" failed in %s!',
           command,
           directory
         );
-        console.error(stderr);
+        console.error(error.stderr.toString('utf-8').trim());
       }
     }
   });
