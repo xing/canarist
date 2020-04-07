@@ -66,9 +66,7 @@ function normalizeWorkspaceVersions(cwd, patterns, write = false) {
           return;
         }
 
-        if (!dependencies[name].includes(versions[name])) {
-          dependencies[name] = versions[name];
-        }
+        dependencies[name] = versions[name];
       });
     });
 
