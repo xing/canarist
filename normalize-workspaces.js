@@ -28,7 +28,10 @@ function logMismatch(type, file, name, versions, dependencies) {
 function normalizeWorkspaceVersions(cwd, patterns, write = false) {
   const versions = {};
   const manifests = glob
-    .sync(patterns.map((pattern) => path.join(cwd, pattern, 'package.json')))
+    .sync(
+      patterns.map((pattern) => path.join(pattern, 'package.json')),
+      { cwd, absolute: true }
+    )
     .map((file) => {
       const manifest = require(file);
 
