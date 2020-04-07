@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const explorer = require('cosmiconfig')('canarist');
+const { cosmiconfigSync } = require('cosmiconfig');
 const debug = require('debug')('canarist');
 const makeDir = require('make-dir');
 const mergeOptions = require('merge-options');
@@ -14,6 +14,8 @@ const writePkg = require('write-pkg');
 const { normalizeArguments, normalizeConfig } = require('./normalize');
 const normalizeWorkspaces = require('./normalize-workspaces');
 const subarg = require('./subarg-patched');
+
+const explorer = cosmiconfigSync('canarist');
 
 const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
 
@@ -34,7 +36,7 @@ if (argv.help || argv._.includes('help')) {
   process.exit(0);
 }
 
-const exploredConfig = explorer.searchSync();
+const exploredConfig = explorer.search();
 const config = normalizeConfig(
   process.argv.length > 2
     ? normalizeArguments(argv)

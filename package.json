@@ -10,14 +10,14 @@
     "test": "echo 'no tests' && exit 0"
   },
   "dependencies": {
-    "cosmiconfig": "^5.2.1",
+    "cosmiconfig": "^6.0.0",
     "debug": "^4.1.1",
-    "fast-glob": "^3.0.0",
+    "fast-glob": "^3.2.2",
     "git-url-parse": "^11.1.2",
-    "make-dir": "^3.0.0",
-    "merge-options": "^1.0.1",
-    "minimist": "^1.2.2",
-    "semver": "^6.1.1",
+    "make-dir": "^3.0.2",
+    "merge-options": "^2.0.0",
+    "minimist": "^1.2.5",
+    "semver": "^7.2.1",
     "write-pkg": "^4.0.0"
   },
   "devDependencies": {
