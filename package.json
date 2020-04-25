@@ -94,9 +94,12 @@
       ":automergeTypes"
     ]
   },
-  "dependencies": {},
+  "dependencies": {
+    "minimist": "^1.2.5"
+  },
   "devDependencies": {
     "@types/jest": "^25.2.1",
+    "@types/minimist": "^1.2.0",
     "@types/node": "^10.13.0",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
