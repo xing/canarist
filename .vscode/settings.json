@@ -1,0 +1,6 @@
+{
+  "eslint.options": {
+    "ignorePath": ".gitignore"
+  },
+  "prettier.ignorePath": ".gitignore"
+}
