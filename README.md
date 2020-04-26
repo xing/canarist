@@ -197,3 +197,11 @@ Examples:
         of the current repository and clones and executes the repositories and commands therein.
         Read more: https://github.com/xing/canarist/blob/master/README.md
 ```
+
+## TODOs
+
+- [ ] add one or more end-to-end integration tests
+- [ ] allow to unpin dependencies which would otherwise be installed multiple times (for example: packages of both repositories have "webpack" as a dependency, one has it pinned to "4.40.0" and the other has a semver range "^4.30.0". If webpack@latest is at 4.40.0 we have no issues, but if webpack has a new release, say 4.41.0, we now have two versions installed).
+- [ ] allow to configure which dotfiles should be copied / merged into the root (currently only ".npmrc" will be merged)
+- [ ] implement a `--no-install` or `--no-commands` flag, as a simple way to "link" two repositories and debug inside them?
+- [ ] encrypted urls in project config to prevent leakage of internal URLs?
