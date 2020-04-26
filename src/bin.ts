@@ -15,6 +15,7 @@ import {
 } from './workspaces';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
+import { yarn } from './yarn';
 
 // const debug = createDebug('canarist');
 
@@ -67,7 +68,7 @@ try {
   manifests.forEach(({ path, manifest }) => {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
   });
-  // install dependencies
+  yarn(config);
   // execute commands in repositories
 } catch (err) {
   process.exitCode = 1;
