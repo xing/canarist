@@ -1,22 +1,20 @@
 #!/usr/bin/env node
 /* eslint-disable node/no-unpublished-bin */
 
+import { join } from 'path';
+import { writeFileSync } from 'fs';
 import { cosmiconfigSync } from 'cosmiconfig';
 import type { Opts } from 'minimist';
 import createDebug from 'debug';
 import type { Arguments, CosmiconfigResut, Config } from './config';
 import { normalizeConfig } from './config';
 import { subarg } from './subarg';
-import { cloneRepositories } from './clone';
+import { cloneRepositories, yarn, executeCommands } from './commands';
 import {
   collectWorkspaces,
   createRootManifest,
   alignWorkspaceVersions,
 } from './workspaces';
-import { join } from 'path';
-import { writeFileSync } from 'fs';
-import { yarn } from './yarn';
-import { executeCommands } from './execute-commands';
 
 const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
 const debug = isDebug ? createDebug('canarist') : undefined;
