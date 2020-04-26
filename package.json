@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "fmt": "prettier --write --ignore-path .gitignore 'src/**/*.ts' 'README.md'"
+    "fmt": "prettier --write --ignore-path .gitignore '**/*.{ts,md}'"
   },
   "husky": {
     "hooks": {
