@@ -47,14 +47,21 @@ function invokeCLI(argv: string[]): Config {
   const config: null | CosmiconfigResut = cosmiconfigSync('canarist').search();
 
   if (args.help) {
-    throw new Error('Usage:');
+    console.log('usage:...'); // todo: log cli help
+    throw new Error('done');
   }
 
-  return normalizeConfig(args, config);
+  try {
+    return normalizeConfig(args, config);
+  } catch (error) {
+    console.error(error);
+    console.log('usage:...'); // todo: log cli help
+    throw new Error('done');
+  }
 }
 
 try {
-  // check if git and yarn are in the PATH
+  // todo: check if git and yarn are in the PATH
   const config = invokeCLI(process.argv.slice(2));
 
   cloneRepositories(config, debug);
@@ -77,7 +84,7 @@ try {
 
   executeCommands(config, debug);
 } catch (err) {
+  // any error should result in non-zero exit code
   process.exitCode = 1;
   console.error(err);
-  // display help
 }
