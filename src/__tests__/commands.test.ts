@@ -49,8 +49,9 @@ describe('command execution', () => {
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveBeenNthCalledWith(
         1,
-        '[canarist] command "%s" failed!',
-        'false'
+        '[canarist] command "%s" failed in "%s"!',
+        'false',
+        '/dev/null'
       );
       expect(spy).toHaveBeenNthCalledWith(2, '');
 
@@ -81,11 +82,7 @@ describe('command execution', () => {
         '/dev/null'
       );
 
-      expect(debug).toHaveBeenNthCalledWith(
-        2,
-        'command: "%s" finished successfully',
-        'true'
-      );
+      expect(debug).toHaveBeenNthCalledWith(2, 'done');
     });
   });
 

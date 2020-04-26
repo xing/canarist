@@ -9,7 +9,7 @@ import createDebug from 'debug';
 import type { Arguments, CosmiconfigResut, Config } from './config';
 import { normalizeConfig } from './config';
 import { subarg } from './subarg';
-import { cloneRepositories, yarn, executeCommands } from './commands';
+import { cloneRepositories, yarn, executeCommands, execute } from './commands';
 import {
   collectWorkspaces,
   createRootManifest,
@@ -61,7 +61,13 @@ function invokeCLI(argv: string[]): Config {
 }
 
 try {
-  // todo: check if git and yarn are in the PATH
+  if (!execute('yarn -v', process.cwd())) {
+    throw new Error('Yarn binary not found.');
+  }
+  if (!execute('git --version', process.cwd())) {
+    throw new Error('Git binary not found.');
+  }
+
   const config = invokeCLI(process.argv.slice(2));
 
   cloneRepositories(config, debug);
@@ -83,8 +89,9 @@ try {
   yarn(config, debug);
 
   executeCommands(config, debug);
+
+  console.log('[canarist] finished successfully!');
 } catch (err) {
-  // any error should result in non-zero exit code
   process.exitCode = 1;
-  console.error(err);
+  console.error('[canarist] exited with error "%s"', err.message);
 }

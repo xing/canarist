@@ -17,11 +17,11 @@ export function execute(
       cwd,
     });
 
-    debug && debug('command: "%s" finished successfully', command);
+    debug && debug('done');
 
     return true;
   } catch (error) {
-    console.error('[canarist] command "%s" failed!', command);
+    console.error('[canarist] command "%s" failed in "%s"!', command, cwd);
     if (error.stderr) {
       console.error(error.stderr.toString('utf-8').trim());
     }
@@ -34,9 +34,10 @@ export function cloneRepositories(config: Config, debug?: Debugger): void {
   config.repositories.forEach(({ url, branch, directory }) => {
     const { protocol, protocols } = gitUrlParse(url);
     const isLocalFilePath = protocol === 'file' && protocols.length === 0;
+    const target = join(config.targetDirectory, directory);
 
     const command = [
-      `git clone ${url} ${join(config.targetDirectory, directory)}`,
+      `git clone ${url} ${target}`,
       `--single-branch`,
       `--no-tags`,
       `--branch ${branch}`,
@@ -45,6 +46,7 @@ export function cloneRepositories(config: Config, debug?: Debugger): void {
       .join(' ')
       .trim();
 
+    console.log('[canarist] cloning "%s#%s" into "%s"', url, branch, target);
     if (!execute(command, config.targetDirectory, debug)) {
       throw new Error('Failed to clone repositories');
     }
@@ -54,6 +56,7 @@ export function cloneRepositories(config: Config, debug?: Debugger): void {
 export function yarn(config: Config, debug?: Debugger): void {
   const command = `yarn ${config.yarnArguments}`.trim();
 
+  console.log('[canarist] installing dependencies with yarn');
   if (!execute(command, config.targetDirectory, debug)) {
     throw new Error('Failed to install dependencies');
   }
@@ -69,6 +72,7 @@ export function executeCommands(config: Config, debug?: Debugger): void {
 
       const cwd = join(config.targetDirectory, repo.directory);
 
+      console.log('[canarist] executing command "%s" in "%s"', command, cwd);
       if (!execute(command, cwd, debug)) {
         throw new Error('Failed to run configured commands');
       }
