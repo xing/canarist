@@ -3,7 +3,7 @@
 
 import { cosmiconfigSync } from 'cosmiconfig';
 import type { Opts } from 'minimist';
-// import createDebug from 'debug';
+import createDebug from 'debug';
 import type { Arguments, CosmiconfigResut, Config } from './config';
 import { normalizeConfig } from './config';
 import { subarg } from './subarg';
@@ -16,8 +16,10 @@ import {
 import { join } from 'path';
 import { writeFileSync } from 'fs';
 import { yarn } from './yarn';
+import { executeCommands } from './execute-commands';
 
-// const debug = createDebug('canarist');
+const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
+const debug = isDebug ? createDebug('canarist') : undefined;
 
 const minimistConfig: Opts = {
   alias: {
@@ -56,8 +58,11 @@ function invokeCLI(argv: string[]): Config {
 try {
   // check if git and yarn are in the PATH
   const config = invokeCLI(process.argv.slice(2));
-  cloneRepositories(config);
+
+  cloneRepositories(config, debug);
+
   const workspacesConfig = collectWorkspaces(config);
+
   const manifests = [
     {
       path: join(config.targetDirectory, 'package.json'),
@@ -65,11 +70,14 @@ try {
     },
     ...alignWorkspaceVersions(workspacesConfig),
   ];
+
   manifests.forEach(({ path, manifest }) => {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
   });
-  yarn(config);
-  // execute commands in repositories
+
+  yarn(config, debug);
+
+  executeCommands(config, debug);
 } catch (err) {
   process.exitCode = 1;
   console.error(err);
