@@ -4,6 +4,7 @@ import { basename, join, resolve } from 'path';
 import minimist from 'minimist';
 import { cosmiconfigSync } from 'cosmiconfig';
 import gitUrlParse from 'git-url-parse';
+import { PackageJSON } from './package-json';
 
 export interface RepositoryConfig {
   url: string;
@@ -14,7 +15,7 @@ export interface RepositoryConfig {
 
 export interface Config {
   targetDirectory: string;
-  rootManifest: Record<string, unknown>;
+  rootManifest: Partial<PackageJSON>;
   yarnArguments: string;
   repositories: RepositoryConfig[];
 }
@@ -151,7 +152,7 @@ export function normalizeConfig(
       ((isSingleConfig(config.config) && config.config.targetDirectory) ||
         (project && project.targetDirectory))) ||
     mkdtempSync(join(tmpdir(), 'canarist-'));
-  const rootManifest =
+  const rootManifest: Partial<PackageJSON> =
     (argv['root-manifest'] && tryParse(argv['root-manifest'])) ||
     (config &&
       ((isSingleConfig(config.config) && config.config.rootManifest) ||

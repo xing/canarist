@@ -8,6 +8,11 @@ import type { Arguments, CosmiconfigResut, Config } from './config';
 import { normalizeConfig } from './config';
 import { subarg } from './subarg';
 import { cloneRepositories } from './clone';
+import {
+  collectWorkspaces,
+  createRootManifest,
+  alignWorkspaceVersions,
+} from './workspaces';
 
 // const debug = createDebug('canarist');
 
@@ -49,10 +54,10 @@ try {
   // check if git and yarn are in the PATH
   const config = invokeCLI(process.argv.slice(2));
   cloneRepositories(config);
-  console.log(config);
-  // create root manifest
-  // merge workspaces in root manifest
-  // align workspace versions
+  const workspacesConfig = collectWorkspaces(config);
+  const rootManifest = createRootManifest(workspacesConfig);
+  const manifests = alignWorkspaceVersions(workspacesConfig);
+  console.log(rootManifest, manifests);
   // install dependencies
   // execute commands in repositories
 } catch (err) {
