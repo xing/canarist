@@ -96,7 +96,8 @@ describe('command execution', () => {
               directory: 'canarist',
             }),
           ],
-        })
+        }),
+        '/cwd'
       );
 
       expect(execSync).toHaveBeenCalledWith(
@@ -107,7 +108,7 @@ describe('command execution', () => {
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/some/directory' }
+        { stdio: 'pipe', cwd: '/cwd' }
       );
     });
 
@@ -124,7 +125,8 @@ describe('command execution', () => {
               directory: 'canarist',
             }),
           ],
-        })
+        }),
+        '/cwd'
       );
 
       expect(execSync).toHaveBeenNthCalledWith(
@@ -136,7 +138,7 @@ describe('command execution', () => {
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/some/directory' }
+        { stdio: 'pipe', cwd: '/cwd' }
       );
 
       expect(execSync).toHaveBeenNthCalledWith(
@@ -147,7 +149,7 @@ describe('command execution', () => {
           '--no-tags',
           '--branch master',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/some/directory' }
+        { stdio: 'pipe', cwd: '/cwd' }
       );
     });
 
@@ -163,7 +165,8 @@ describe('command execution', () => {
                 url: 'https://github.com/xing/canarist.git',
               }),
             ],
-          })
+          }),
+          '/cwd'
         )
       ).toThrow(/Failed to clone repositories/);
 

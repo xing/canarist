@@ -30,7 +30,11 @@ export function execute(
   }
 }
 
-export function cloneRepositories(config: Config, debug?: Debugger): void {
+export function cloneRepositories(
+  config: Config,
+  cwd: string,
+  debug?: Debugger
+): void {
   config.repositories.forEach(({ url, branch, directory }) => {
     const { protocol, protocols } = gitUrlParse(url);
     const isLocalFilePath = protocol === 'file' && protocols.length === 0;
@@ -47,7 +51,7 @@ export function cloneRepositories(config: Config, debug?: Debugger): void {
       .trim();
 
     console.log('[canarist] cloning "%s#%s" into "%s"', url, branch, target);
-    if (!execute(command, config.targetDirectory, debug)) {
+    if (!execute(command, cwd, debug)) {
       throw new Error('Failed to clone repositories');
     }
   });

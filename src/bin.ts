@@ -73,7 +73,7 @@ try {
 
   const config = invokeCLI(process.argv.slice(2));
 
-  cloneRepositories(config, debug);
+  cloneRepositories(config, process.cwd(), debug);
 
   const workspacesConfig = collectWorkspaces(config);
 
