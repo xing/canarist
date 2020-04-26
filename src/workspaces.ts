@@ -65,7 +65,21 @@ export function createRootManifest(config: WorkspacesConfig): PackageJSON {
         .flat(),
       resolutions: config.repositories.reduce((resolutions, repo) => {
         if (repo.manifest.resolutions) {
-          mergeWith(resolutions, repo.manifest.resolutions);
+          mergeWith(
+            resolutions,
+            repo.manifest.resolutions,
+            (objValue, srcValue, key) => {
+              if (objValue && srcValue) {
+                console.warn(
+                  '[canarist] incompatible resolutions found: "%s" is defined as "%s" and "%s"',
+                  key,
+                  objValue,
+                  srcValue
+                );
+                return srcValue;
+              }
+            }
+          );
         }
         return resolutions;
       }, {}),

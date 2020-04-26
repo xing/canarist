@@ -242,6 +242,39 @@ describe('createRootManifest', () => {
 
     expect(manifest.resolutions).toEqual({ jest: '^24.0.0' });
   });
+
+  it('should warn on incompatible resolutions', () => {
+    const spy = jest.spyOn(console, 'warn').mockImplementation(() => {
+      /* swallow logs */
+    });
+
+    const manifest = createRootManifest(
+      partialWorkspacesConfig({
+        repositories: [
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/canarist.git',
+            directory: 'canarist',
+            manifest: canaristManifest,
+          }),
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/canarist.git',
+            directory: 'canarist',
+            manifest: { ...canaristManifest, resolutions: { jest: '^25.0.0' } },
+          }),
+        ],
+      })
+    );
+
+    expect(manifest.resolutions).toEqual({ jest: '^25.0.0' });
+    expect(spy).toHaveBeenCalledWith(
+      '[canarist] incompatible resolutions found: "%s" is defined as "%s" and "%s"',
+      'jest',
+      '^24.0.0',
+      '^25.0.0'
+    );
+
+    spy.mockRestore();
+  });
 });
 
 describe('alignWorkspaceVersions', () => {
