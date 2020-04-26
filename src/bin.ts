@@ -2,7 +2,7 @@
 /* eslint-disable node/no-unpublished-bin */
 
 import { join } from 'path';
-import { writeFileSync } from 'fs';
+import { writeFileSync, existsSync, appendFileSync, readFileSync } from 'fs';
 import { cosmiconfigSync } from 'cosmiconfig';
 import type { Opts } from 'minimist';
 import createDebug from 'debug';
@@ -91,7 +91,17 @@ try {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
   });
 
-  // todo: allow to concat / merge config files (.npmrc, .yarnrc, etc)
+  // todo: allow to configure which files should be merged?
+  config.repositories.forEach((repo) => {
+    const npmrcPath = join(config.targetDirectory, repo.directory, '.npmrc');
+
+    if (existsSync(npmrcPath)) {
+      appendFileSync(
+        join(config.targetDirectory, '.npmrc'),
+        readFileSync(npmrcPath) + '\n'
+      );
+    }
+  });
 
   yarn(config, debug);
 
