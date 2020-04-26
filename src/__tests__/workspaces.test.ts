@@ -93,6 +93,20 @@ function partialConfig({
   };
 }
 
+function partialWorkspacesConfig({
+  repositories = [],
+  targetDirectory = '/some/directory',
+  yarnArguments = '',
+  rootManifest = {},
+}: Partial<WorkspacesConfig> = {}): WorkspacesConfig {
+  return {
+    repositories,
+    targetDirectory,
+    yarnArguments,
+    rootManifest,
+  };
+}
+
 describe('collectWorkspaces', () => {
   beforeEach(() => {
     (readFileSync as jest.Mock).mockImplementation(readFileSyncMock);
@@ -172,7 +186,7 @@ describe('collectWorkspaces', () => {
 
 describe('createRootManifest', () => {
   it('should create root manifest', () => {
-    const manifest = createRootManifest(partialConfig() as WorkspacesConfig);
+    const manifest = createRootManifest(partialWorkspacesConfig());
 
     expect(manifest).toEqual({
       name: 'canarist-root',
@@ -185,12 +199,12 @@ describe('createRootManifest', () => {
 
   it('should merge root manifest additions', () => {
     const manifest = createRootManifest(
-      partialConfig({
+      partialWorkspacesConfig({
         rootManifest: {
           devDependencies: { jest: '^25' },
           workspaces: ['another-workspace'],
         },
-      }) as WorkspacesConfig
+      })
     );
 
     expect(manifest).toEqual({
@@ -207,7 +221,7 @@ describe('createRootManifest', () => {
 
   it('should merge workspaces of root manifests', () => {
     const manifest = createRootManifest(
-      partialConfig({
+      partialWorkspacesConfig({
         repositories: [
           {
             url: 'https://github.com/xing/canarist.git',
@@ -239,8 +253,7 @@ describe('createRootManifest', () => {
             ],
           },
         ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as WorkspacesConfig
+      })
     );
 
     expect(manifest.workspaces).toEqual([
@@ -253,7 +266,7 @@ describe('createRootManifest', () => {
 
   it('should merge resolutions of root manifests', () => {
     const manifest = createRootManifest(
-      partialConfig({
+      partialWorkspacesConfig({
         repositories: [
           {
             url: 'https://github.com/xing/canarist.git',
@@ -264,8 +277,7 @@ describe('createRootManifest', () => {
             packages: [],
           },
         ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as WorkspacesConfig
+      })
     );
 
     expect(manifest.resolutions).toEqual({ jest: '^24.0.0' });
@@ -275,7 +287,7 @@ describe('createRootManifest', () => {
 describe('alignWorkspaceVersions', () => {
   it('should align all versions across workspaces', () => {
     const manifests = alignWorkspaceVersions(
-      partialConfig({
+      partialWorkspacesConfig({
         repositories: [
           {
             url: 'https://github.com/xing/canarist.git',
@@ -307,8 +319,7 @@ describe('alignWorkspaceVersions', () => {
             ],
           },
         ],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as WorkspacesConfig
+      })
     );
 
     expect(manifests).toEqual([

@@ -1,7 +1,6 @@
 import { execSync } from 'child_process';
 import { execute, executeCommands, cloneRepositories, yarn } from '../commands';
 import type { Debugger } from 'debug';
-import { Config } from '../config';
 
 jest.mock('child_process');
 
@@ -97,10 +96,13 @@ describe('command execution', () => {
             url: 'https://github.com/xing/canarist.git',
             branch: 'master',
             directory: 'canarist',
+            commands: [''],
           },
         ],
         targetDirectory: '/dev/null',
-      } as Config);
+        rootManifest: {},
+        yarnArguments: '',
+      });
 
       expect(execSync).toHaveBeenCalledWith(
         [
@@ -121,15 +123,19 @@ describe('command execution', () => {
             url: 'https://github.com/xing/canarist.git',
             branch: 'master',
             directory: 'canarist',
+            commands: [''],
           },
           {
             url: '.',
             branch: 'master',
             directory: 'canarist',
+            commands: [''],
           },
         ],
         targetDirectory: '/dev/null',
-      } as Config);
+        rootManifest: {},
+        yarnArguments: '',
+      });
 
       expect(execSync).toHaveBeenNthCalledWith(
         1,
@@ -166,10 +172,13 @@ describe('command execution', () => {
               url: 'https://github.com/xing/canarist.git',
               branch: 'master',
               directory: 'canarist',
+              commands: [''],
             },
           ],
           targetDirectory: '/dev/null',
-        } as Config)
+          rootManifest: {},
+          yarnArguments: '',
+        })
       ).toThrow(/Failed to clone repositories/);
 
       spy.mockRestore();
