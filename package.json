@@ -1,7 +1,7 @@
 {
   "name": "canarist",
   "version": "2.0.0",
-  "main": "dist/index.js",
+  "bin": "dist/bin.js",
   "author": "Björn Brauer <bjoern.brauer@new-work.se>",
   "license": "MIT",
   "engines": {
