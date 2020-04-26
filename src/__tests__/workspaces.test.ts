@@ -3,7 +3,7 @@ import glob from 'fast-glob';
 import {
   collectWorkspaces,
   createRootManifest,
-  FullConfig,
+  WorkspacesConfig,
   alignWorkspaceVersions,
 } from '../workspaces';
 import { Config } from '../config';
@@ -172,7 +172,7 @@ describe('collectWorkspaces', () => {
 
 describe('createRootManifest', () => {
   it('should create root manifest', () => {
-    const manifest = createRootManifest(partialConfig() as FullConfig);
+    const manifest = createRootManifest(partialConfig() as WorkspacesConfig);
 
     expect(manifest).toEqual({
       name: 'canarist-root',
@@ -190,7 +190,7 @@ describe('createRootManifest', () => {
           devDependencies: { jest: '^25' },
           workspaces: ['another-workspace'],
         },
-      }) as FullConfig
+      }) as WorkspacesConfig
     );
 
     expect(manifest).toEqual({
@@ -240,7 +240,7 @@ describe('createRootManifest', () => {
           },
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as FullConfig
+      } as any) as WorkspacesConfig
     );
 
     expect(manifest.workspaces).toEqual([
@@ -265,7 +265,7 @@ describe('createRootManifest', () => {
           },
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as FullConfig
+      } as any) as WorkspacesConfig
     );
 
     expect(manifest.resolutions).toEqual({ jest: '^24.0.0' });
@@ -308,7 +308,7 @@ describe('alignWorkspaceVersions', () => {
           },
         ],
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any) as FullConfig
+      } as any) as WorkspacesConfig
     );
 
     expect(manifests).toEqual([

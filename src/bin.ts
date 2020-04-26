@@ -13,6 +13,8 @@ import {
   createRootManifest,
   alignWorkspaceVersions,
 } from './workspaces';
+import { join } from 'path';
+import { writeFileSync } from 'fs';
 
 // const debug = createDebug('canarist');
 
@@ -55,9 +57,16 @@ try {
   const config = invokeCLI(process.argv.slice(2));
   cloneRepositories(config);
   const workspacesConfig = collectWorkspaces(config);
-  const rootManifest = createRootManifest(workspacesConfig);
-  const manifests = alignWorkspaceVersions(workspacesConfig);
-  console.log(rootManifest, manifests);
+  const manifests = [
+    {
+      path: join(config.targetDirectory, 'package.json'),
+      manifest: createRootManifest(workspacesConfig),
+    },
+    ...alignWorkspaceVersions(workspacesConfig),
+  ];
+  manifests.forEach(({ path, manifest }) => {
+    writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
+  });
   // install dependencies
   // execute commands in repositories
 } catch (err) {

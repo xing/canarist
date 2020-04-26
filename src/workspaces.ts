@@ -5,14 +5,14 @@ import mergeWith from 'lodash.mergewith';
 import { Config } from './config';
 import { PackageJSON } from './package-json';
 
-export interface FullConfig extends Config {
+export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
     manifest: PackageJSON;
     packages: { path: string; manifest: PackageJSON }[];
   })[];
 }
 
-export function collectWorkspaces(config: Config): FullConfig {
+export function collectWorkspaces(config: Config): WorkspacesConfig {
   const repositories = config.repositories.map((repo) => {
     const manifest = JSON.parse(
       readFileSync(
@@ -48,7 +48,7 @@ export function collectWorkspaces(config: Config): FullConfig {
   };
 }
 
-export function createRootManifest(config: FullConfig): PackageJSON {
+export function createRootManifest(config: WorkspacesConfig): PackageJSON {
   return mergeWith(
     {
       name: 'canarist-root',
@@ -81,7 +81,7 @@ export function createRootManifest(config: FullConfig): PackageJSON {
 }
 
 export function alignWorkspaceVersions(
-  config: FullConfig
+  config: WorkspacesConfig
 ): { path: string; manifest: PackageJSON }[] {
   const packages = [
     ...config.repositories.map((repo) => {
