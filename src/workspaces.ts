@@ -85,9 +85,13 @@ export function alignWorkspaceVersions(
 ): { path: string; manifest: PackageJSON }[] {
   const packages = [
     ...config.repositories.map((repo) => {
+      const manifest = JSON.parse(JSON.stringify(repo.manifest)) as PackageJSON;
       return {
         path: join(config.targetDirectory, repo.directory, 'package.json'),
-        manifest: JSON.parse(JSON.stringify(repo.manifest)) as PackageJSON,
+        manifest: {
+          version: '0.0.0-test',
+          ...manifest,
+        },
       };
     }),
     ...config.repositories
