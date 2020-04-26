@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import { execute, executeCommands, cloneRepositories, yarn } from '../commands';
 import type { Debugger } from 'debug';
+import { partialConfig, partialRepositoryConfig } from './_helpers';
 
 jest.mock('child_process');
 
@@ -90,74 +91,66 @@ describe('command execution', () => {
 
   describe('clone repositories', () => {
     it('should clone single repository', () => {
-      cloneRepositories({
-        repositories: [
-          {
-            url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
-            directory: 'canarist',
-            commands: [''],
-          },
-        ],
-        targetDirectory: '/dev/null',
-        rootManifest: {},
-        yarnArguments: '',
-      });
+      cloneRepositories(
+        partialConfig({
+          repositories: [
+            partialRepositoryConfig({
+              url: 'https://github.com/xing/canarist.git',
+              directory: 'canarist',
+            }),
+          ],
+        })
+      );
 
       expect(execSync).toHaveBeenCalledWith(
         [
-          'git clone https://github.com/xing/canarist.git /dev/null/canarist',
+          'git clone https://github.com/xing/canarist.git /some/directory/canarist',
           '--single-branch',
           '--no-tags',
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/dev/null' }
+        { stdio: 'pipe', cwd: '/some/directory' }
       );
     });
 
     it('should clone multiple repositories', () => {
-      cloneRepositories({
-        repositories: [
-          {
-            url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
-            directory: 'canarist',
-            commands: [''],
-          },
-          {
-            url: '.',
-            branch: 'master',
-            directory: 'canarist',
-            commands: [''],
-          },
-        ],
-        targetDirectory: '/dev/null',
-        rootManifest: {},
-        yarnArguments: '',
-      });
+      cloneRepositories(
+        partialConfig({
+          repositories: [
+            partialRepositoryConfig({
+              url: 'https://github.com/xing/canarist.git',
+              directory: 'canarist',
+            }),
+            partialRepositoryConfig({
+              url: '.',
+              directory: 'canarist',
+            }),
+          ],
+        })
+      );
 
       expect(execSync).toHaveBeenNthCalledWith(
         1,
         [
-          'git clone https://github.com/xing/canarist.git /dev/null/canarist',
+          'git clone https://github.com/xing/canarist.git /some/directory/canarist',
           '--single-branch',
           '--no-tags',
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/dev/null' }
+        { stdio: 'pipe', cwd: '/some/directory' }
       );
 
       expect(execSync).toHaveBeenNthCalledWith(
         2,
         [
-          'git clone . /dev/null/canarist',
+          'git clone . /some/directory/canarist',
           '--single-branch',
           '--no-tags',
           '--branch master',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/dev/null' }
+        { stdio: 'pipe', cwd: '/some/directory' }
       );
     });
 
@@ -166,19 +159,15 @@ describe('command execution', () => {
       const spy = consoleErrorSpy();
 
       expect(() =>
-        cloneRepositories({
-          repositories: [
-            {
-              url: 'https://github.com/xing/canarist.git',
-              branch: 'master',
-              directory: 'canarist',
-              commands: [''],
-            },
-          ],
-          targetDirectory: '/dev/null',
-          rootManifest: {},
-          yarnArguments: '',
-        })
+        cloneRepositories(
+          partialConfig({
+            repositories: [
+              partialRepositoryConfig({
+                url: 'https://github.com/xing/canarist.git',
+              }),
+            ],
+          })
+        )
       ).toThrow(/Failed to clone repositories/);
 
       spy.mockRestore();
@@ -187,12 +176,7 @@ describe('command execution', () => {
 
   describe('yarn', () => {
     it('should install dependencies using yarn', () => {
-      yarn({
-        repositories: [],
-        rootManifest: {},
-        targetDirectory: '/some/directory',
-        yarnArguments: '',
-      });
+      yarn(partialConfig());
 
       expect(execSync).toHaveBeenCalledWith('yarn', {
         stdio: 'pipe',
@@ -201,12 +185,7 @@ describe('command execution', () => {
     });
 
     it('should pass extra arguments to yarn', () => {
-      yarn({
-        repositories: [],
-        rootManifest: {},
-        targetDirectory: '/some/directory',
-        yarnArguments: '--production=false',
-      });
+      yarn(partialConfig({ yarnArguments: '--production=false' }));
 
       expect(execSync).toHaveBeenCalledWith('yarn --production=false', {
         stdio: 'pipe',
@@ -218,14 +197,9 @@ describe('command execution', () => {
       (execSync as jest.Mock).mockImplementationOnce(execSyncError);
       const spy = consoleErrorSpy();
 
-      expect(() =>
-        yarn({
-          repositories: [],
-          rootManifest: {},
-          targetDirectory: '/some/directory',
-          yarnArguments: '',
-        })
-      ).toThrow(/Failed to install dependencies/);
+      expect(() => yarn(partialConfig())).toThrow(
+        /Failed to install dependencies/
+      );
 
       spy.mockRestore();
     });
@@ -237,19 +211,16 @@ describe('command execution', () => {
     });
 
     it('should execute commands', () => {
-      executeCommands({
-        repositories: [
-          {
-            url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
-            directory: 'canarist',
-            commands: ['yarn test'],
-          },
-        ],
-        targetDirectory: '/some/directory',
-        rootManifest: {},
-        yarnArguments: '',
-      });
+      executeCommands(
+        partialConfig({
+          repositories: [
+            partialRepositoryConfig({
+              url: 'https://github.com/xing/canarist.git',
+              directory: 'canarist',
+            }),
+          ],
+        })
+      );
 
       expect(execSync).toHaveBeenCalledWith('yarn test', {
         stdio: 'pipe',
@@ -261,19 +232,14 @@ describe('command execution', () => {
       const debug = jest.fn();
 
       executeCommands(
-        {
+        partialConfig({
           repositories: [
-            {
+            partialRepositoryConfig({
               url: 'https://github.com/xing/canarist.git',
-              branch: 'master',
-              directory: 'canarist',
               commands: [''],
-            },
+            }),
           ],
-          targetDirectory: '/some/directory',
-          rootManifest: {},
-          yarnArguments: '',
-        },
+        }),
         (debug as unknown) as Debugger
       );
 
@@ -289,19 +255,16 @@ describe('command execution', () => {
       const spy = consoleErrorSpy();
 
       expect(() =>
-        executeCommands({
-          repositories: [
-            {
-              url: 'https://github.com/xing/canarist.git',
-              branch: 'master',
-              directory: 'canarist',
-              commands: ['yarn test'],
-            },
-          ],
-          targetDirectory: '/some/directory',
-          rootManifest: {},
-          yarnArguments: '',
-        })
+        executeCommands(
+          partialConfig({
+            repositories: [
+              partialRepositoryConfig({
+                url: 'https://github.com/xing/canarist.git',
+                directory: 'canarist',
+              }),
+            ],
+          })
+        )
       ).toThrow(/Failed to run configured commands/);
 
       spy.mockRestore();

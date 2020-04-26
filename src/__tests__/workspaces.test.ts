@@ -3,10 +3,14 @@ import glob from 'fast-glob';
 import {
   collectWorkspaces,
   createRootManifest,
-  WorkspacesConfig,
   alignWorkspaceVersions,
 } from '../workspaces';
-import { Config } from '../config';
+import {
+  partialWorkspacesConfig,
+  partialConfig,
+  partialRepositoryConfig,
+  partialWorkspacesRepositoryConfig,
+} from './_helpers';
 
 jest.mock('fs');
 jest.mock('fast-glob');
@@ -79,34 +83,6 @@ function globSyncMock(pattern: string): string[] {
   return [];
 }
 
-function partialConfig({
-  repositories = [],
-  targetDirectory = '/some/directory',
-  yarnArguments = '',
-  rootManifest = {},
-}: Partial<Config> = {}): Config {
-  return {
-    repositories,
-    targetDirectory,
-    yarnArguments,
-    rootManifest,
-  };
-}
-
-function partialWorkspacesConfig({
-  repositories = [],
-  targetDirectory = '/some/directory',
-  yarnArguments = '',
-  rootManifest = {},
-}: Partial<WorkspacesConfig> = {}): WorkspacesConfig {
-  return {
-    repositories,
-    targetDirectory,
-    yarnArguments,
-    rootManifest,
-  };
-}
-
 describe('collectWorkspaces', () => {
   beforeEach(() => {
     (readFileSync as jest.Mock).mockImplementation(readFileSyncMock);
@@ -122,18 +98,14 @@ describe('collectWorkspaces', () => {
     const config = collectWorkspaces(
       partialConfig({
         repositories: [
-          {
+          partialRepositoryConfig({
             url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
             directory: 'canarist',
-            commands: [],
-          },
-          {
+          }),
+          partialRepositoryConfig({
             url: 'https://github.com/xing/hops.git',
-            branch: 'master',
             directory: 'hops',
-            commands: [],
-          },
+          }),
         ],
       })
     );
@@ -148,18 +120,14 @@ describe('collectWorkspaces', () => {
     const config = collectWorkspaces(
       partialConfig({
         repositories: [
-          {
+          partialRepositoryConfig({
             url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
             directory: 'canarist',
-            commands: [],
-          },
-          {
+          }),
+          partialRepositoryConfig({
             url: 'https://github.com/xing/hops.git',
-            branch: 'master',
             directory: 'hops',
-            commands: [],
-          },
+          }),
         ],
       })
     );
@@ -223,19 +191,14 @@ describe('createRootManifest', () => {
     const manifest = createRootManifest(
       partialWorkspacesConfig({
         repositories: [
-          {
+          partialWorkspacesRepositoryConfig({
             url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
             directory: 'canarist',
-            commands: [],
             manifest: canaristManifest,
-            packages: [],
-          },
-          {
+          }),
+          partialWorkspacesRepositoryConfig({
             url: 'https://github.com/xing/hops.git',
-            branch: 'master',
             directory: 'hops',
-            commands: [],
             manifest: hopsManifest,
             packages: [
               {
@@ -251,7 +214,7 @@ describe('createRootManifest', () => {
                 manifest: hopsPackage2Manifest,
               },
             ],
-          },
+          }),
         ],
       })
     );
@@ -268,14 +231,11 @@ describe('createRootManifest', () => {
     const manifest = createRootManifest(
       partialWorkspacesConfig({
         repositories: [
-          {
+          partialWorkspacesRepositoryConfig({
             url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
             directory: 'canarist',
-            commands: [],
             manifest: canaristManifest,
-            packages: [],
-          },
+          }),
         ],
       })
     );
@@ -289,19 +249,14 @@ describe('alignWorkspaceVersions', () => {
     const manifests = alignWorkspaceVersions(
       partialWorkspacesConfig({
         repositories: [
-          {
+          partialWorkspacesRepositoryConfig({
             url: 'https://github.com/xing/canarist.git',
-            branch: 'master',
             directory: 'canarist',
-            commands: [],
             manifest: canaristManifest,
-            packages: [],
-          },
-          {
+          }),
+          partialWorkspacesRepositoryConfig({
             url: 'https://github.com/xing/hops.git',
-            branch: 'master',
             directory: 'hops',
-            commands: [],
             manifest: hopsManifest,
             packages: [
               {
@@ -317,7 +272,7 @@ describe('alignWorkspaceVersions', () => {
                 manifest: hopsPackage2Manifest,
               },
             ],
-          },
+          }),
         ],
       })
     );

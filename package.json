@@ -30,7 +30,11 @@
         "testEnvironment": "node",
         "testPathIgnorePatterns": [
           "/node_modules/",
-          "<rootDir>/dist/"
+          "<rootDir>/dist/",
+          "<rootDir>/src/__tests__/_helpers.ts"
+        ],
+        "coveragePathIgnorePatterns": [
+          "<rootDir>/src/__tests__/_helpers.ts"
         ]
       },
       {
