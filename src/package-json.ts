@@ -1,52 +1,3 @@
-interface Author {
-  name: string;
-  email?: string;
-  url?: string;
-}
-
-interface BinMap {
-  [commandName: string]: string;
-}
-
-interface Bugs {
-  email: string;
-  url: string;
-}
-
-interface DependencyMap {
-  [dependencyName: string]: string;
-}
-
-interface Directories {
-  lib?: string;
-  bin?: string;
-  man?: string;
-  doc?: string;
-  example?: string;
-  test?: string;
-}
-
-interface Engines {
-  node?: string;
-  npm?: string;
-  yarn?: string;
-}
-
-interface PublishConfig {
-  access?: string;
-  registry?: string;
-  tag?: string;
-}
-
-interface Repository {
-  type: string;
-  url: string;
-}
-
-interface ScriptsMap {
-  [scriptName: string]: string;
-}
-
 export interface PackageJSON extends Record<string, unknown> {
   // essentials https://classic.yarnpkg.com/en/docs/package-json/#toc-essentials
   name: string;
@@ -59,41 +10,56 @@ export interface PackageJSON extends Record<string, unknown> {
 
   // links https://classic.yarnpkg.com/en/docs/package-json/#toc-links
   homepage?: string;
-  bugs?: string | Bugs;
-  repository?: string | Repository;
+  bugs?: string | { email: string; url: string };
+  repository?: string | { type: string; url: string };
 
   // maintainers https://classic.yarnpkg.com/en/docs/package-json/#toc-maintainers
-  author?: string | Author;
-  contributors?: string[] | Author[];
+  author?: string | { name: string; email?: string; url?: string };
+  contributors?: string[] | { name: string; email?: string; url?: string }[];
 
   // files https://classic.yarnpkg.com/en/docs/package-json/#toc-files
   files?: string[];
   main?: string;
-  bin?: string | BinMap;
+  bin?: string | Record<string, string>;
   man?: string | string[];
-  directories?: Directories;
+  directories?: {
+    lib?: string;
+    bin?: string;
+    man?: string;
+    doc?: string;
+    example?: string;
+    test?: string;
+  };
 
   // tasks https://classic.yarnpkg.com/en/docs/package-json/#toc-tasks
-  scripts?: ScriptsMap;
+  scripts?: Record<string, string>;
   config?: Record<string, unknown>;
 
   // dependencies https://classic.yarnpkg.com/en/docs/package-json/#toc-dependencies
-  dependencies?: DependencyMap;
-  devDependencies?: DependencyMap;
-  peerDependencies?: DependencyMap;
-  peerDependenciesMeta?: { [dependencyName: string]: { optional?: boolean } };
-  optionalDependencies?: DependencyMap;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
+  optionalDependencies?: Record<string, string>;
   bundledDependencies?: string[];
   flat?: boolean;
-  resolutions?: DependencyMap;
+  resolutions?: Record<string, string>;
   workspaces?: string[];
 
   // system https://classic.yarnpkg.com/en/docs/package-json/#toc-system
-  engines?: Engines;
+  engines?: {
+    node?: string;
+    npm?: string;
+    yarn?: string;
+  };
   os?: string[];
   cpu?: string[];
 
   // publishing https://classic.yarnpkg.com/en/docs/package-json/#toc-publishing
   private?: boolean;
-  publishConfig?: PublishConfig;
+  publishConfig?: {
+    access?: string;
+    registry?: string;
+    tag?: string;
+  };
 }
