@@ -46,6 +46,9 @@ function invokeCLI(argv: string[]): Config {
   const args: Arguments = subarg(argv, minimistConfig);
   const config: null | CosmiconfigResut = cosmiconfigSync('canarist').search();
 
+  // todo: how about a --no-install flag
+  // todo: how about a --no-commands flag
+
   if (args.help) {
     console.log('usage:...'); // todo: log cli help
     throw new Error('done');
@@ -82,9 +85,13 @@ try {
     ...alignWorkspaceVersions(workspacesConfig),
   ];
 
+  // todo: allow to change pinned versions to semver ranges
+
   manifests.forEach(({ path, manifest }) => {
     writeFileSync(path, JSON.stringify(manifest, null, 2) + '\n');
   });
+
+  // todo: allow to concat / merge config files (.npmrc, .yarnrc, etc)
 
   yarn(config, debug);
 
