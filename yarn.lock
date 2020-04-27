@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-is-promise@^2.0.0:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/is-promise/-/is-promise-2.2.2.tgz#39ab959ccbf9a774cf079f7b40c7a26f763135f1"
-  integrity sha512-+lP4/6lKUBfQjZ2pdxThZvLUAafmZb8OAxFb8XXtiQmS35INgr85hdOGoEs124ez1FCnZJt6jau/T+alh58QFQ==
+is-promise@2.2.0, is-promise@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/is-promise/-/is-promise-2.2.0.tgz#3ebfc546cee7064c314686279cc9df7bc2724715"
+  integrity sha512-N/4ZxZGjDLAWJQNtcq1/5AOiWTAAhDwnjlaGPaC2+p3pQ+Ka2Dl/EL29DppuoiZ8Xr1/p/9ywBGGzHRPoWKfGA==
 
 left-pad@0.0.1:
   version "0.0.1"
