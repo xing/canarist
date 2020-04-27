@@ -140,8 +140,8 @@ try {
   // todo: allow to change pinned versions to semver ranges
 
   manifests.forEach(({ path, manifest }) => {
-    const content = readFileSync(path, 'utf-8');
-    const finalNewLine = content.substr(content.lastIndexOf('}'));
+    const content = existsSync(path) ? readFileSync(path, 'utf-8') : '}\n';
+    const finalNewLine = content.substr(content.lastIndexOf('}') + 1);
     writeFileSync(path, JSON.stringify(manifest, null, 2) + finalNewLine);
   });
 
