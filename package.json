@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
+  "scripts": {
+    "build": "echo '...running build tasks for a-1, a-2, a-3'"
+  },
   "workspaces": [
     "packages/*"
   ],
