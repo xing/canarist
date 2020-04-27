@@ -2,8 +2,8 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import glob from 'fast-glob';
 import mergeWith from 'lodash.mergewith';
-import { Config } from './config';
-import { PackageJSON } from './package-json';
+import type { Config } from './config';
+import type { PackageJSON } from './package-json';
 
 export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
@@ -135,10 +135,11 @@ export function alignWorkspaceVersions(
       'peerDependencies',
       'optionalDependencies',
     ] as const).forEach((type) => {
-      const dependencies = Object.keys(pkg.manifest[type] || {});
-      dependencies.forEach((name) => {
-        if (name in versions) {
-          pkg.manifest[type][name] = versions[name];
+      const names = Object.keys(pkg.manifest[type] || {});
+      names.forEach((name) => {
+        const dependencies = pkg.manifest[type];
+        if (dependencies && name in versions) {
+          dependencies[name] = versions[name];
         }
       });
     });

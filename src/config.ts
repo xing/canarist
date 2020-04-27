@@ -1,10 +1,10 @@
 import { mkdtempSync } from 'fs';
 import { tmpdir } from 'os';
 import { basename, join, resolve } from 'path';
-import minimist from 'minimist';
-import { cosmiconfigSync } from 'cosmiconfig';
+import type minimist from 'minimist';
+import type { cosmiconfigSync } from 'cosmiconfig';
 import gitUrlParse from 'git-url-parse';
-import { PackageJSON } from './package-json';
+import type { PackageJSON } from './package-json';
 
 export interface RepositoryConfig {
   url: string;
@@ -29,11 +29,11 @@ interface ProjectsConfig extends Omit<Partial<Config>, 'repositories'> {
   projects: (SingleConfig & { name: string })[];
 }
 
-export interface CosmiconfigResut
-  extends Omit<
-    ReturnType<ReturnType<typeof cosmiconfigSync>['search']>,
-    'config'
-  > {
+type Cosmiconfig = typeof cosmiconfigSync;
+type CosmiconfigSearch = ReturnType<Cosmiconfig>['search'];
+
+export interface CosmiconfigResult
+  extends NonNullable<ReturnType<CosmiconfigSearch>> {
   config: SingleConfig | ProjectsConfig;
 }
 
@@ -117,7 +117,7 @@ function normalizeRepository(
 
 export function normalizeConfig(
   argv: Arguments,
-  config: null | CosmiconfigResut
+  config: null | CosmiconfigResult
 ): Config {
   if (!argv.repository) {
     if (!config) {
@@ -143,7 +143,7 @@ export function normalizeConfig(
 
   const repositories = [];
   const project =
-    argv.project && isProjectsConfig(config.config)
+    argv.project && config && isProjectsConfig(config.config)
       ? config.config.projects.find((p) => p.name === argv.project)
       : null;
   const targetDirectory =
@@ -169,11 +169,11 @@ export function normalizeConfig(
     repositories.push(normalizeRepository(argv.repository));
   } else if (Array.isArray(argv.repository)) {
     repositories.push(...argv.repository.map(normalizeRepository));
-  } else if (argv.project && isProjectsConfig(config.config)) {
+  } else if (argv.project && config && isProjectsConfig(config.config)) {
     if (project) {
       repositories.push(...project.repositories.map(normalizeRepository));
     }
-  } else if (isSingleConfig(config.config)) {
+  } else if (config && isSingleConfig(config.config)) {
     repositories.push(...config.config.repositories.map(normalizeRepository));
   }
 

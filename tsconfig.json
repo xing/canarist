@@ -6,16 +6,16 @@
     "module": "commonjs",
     "lib": ["ESNext"],
     "declaration": true,
-    "declarationMap": true,
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
 
-    "noImplicitAny": true,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "importsNotUsedAsValues": "error",
 
     "moduleResolution": "node",
     "esModuleInterop": true,

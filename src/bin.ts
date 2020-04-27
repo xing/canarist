@@ -6,7 +6,7 @@ import { writeFileSync, existsSync, appendFileSync, readFileSync } from 'fs';
 import { cosmiconfigSync } from 'cosmiconfig';
 import type { Opts } from 'minimist';
 import createDebug from 'debug';
-import type { Arguments, CosmiconfigResut, Config } from './config';
+import type { Arguments, CosmiconfigResult, Config } from './config';
 import { normalizeConfig } from './config';
 import { subarg } from './subarg';
 import { cloneRepositories, yarn, executeCommands, execute } from './commands';
@@ -95,7 +95,7 @@ Examples:
 
 function invokeCLI(argv: string[]): Config {
   const args: Arguments = subarg(argv, minimistConfig);
-  const config: null | CosmiconfigResut = cosmiconfigSync('canarist').search();
+  const config: null | CosmiconfigResult = cosmiconfigSync('canarist').search();
 
   // todo: how about a --no-install or --no-commands flag to enable quick debugging?
 
