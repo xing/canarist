@@ -10,6 +10,9 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
+    "posttest": "yarn test:integration",
+    "pretest:integration": "yarn build",
+    "test:integration": "jest --config '{\"preset\":\"ts-jest\"}' src/__tests__/_integration-test.ts",
     "fmt": "prettier --write --ignore-path .gitignore '**/*.{ts,md}'"
   },
   "husky": {
@@ -31,10 +34,10 @@
         "testPathIgnorePatterns": [
           "/node_modules/",
           "<rootDir>/dist/",
-          "<rootDir>/src/__tests__/_helpers.ts"
+          "<rootDir>/src/__tests__/_"
         ],
         "coveragePathIgnorePatterns": [
-          "<rootDir>/src/__tests__/_helpers.ts"
+          "<rootDir>/src/__tests__/_"
         ]
       },
       {
