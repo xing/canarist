@@ -1,0 +1,12 @@
+{
+  "name": "a-3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "a-2": "^1.0.0"
+  },
+  "devDependencies": {
+    "a-2": "^1.0.0"
+  }
+}
