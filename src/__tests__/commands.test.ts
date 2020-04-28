@@ -35,7 +35,9 @@ describe('command execution', () => {
     });
 
     it('should execute failing commands', () => {
-      (execSync as jest.Mock).mockImplementationOnce(execSyncError);
+      (execSync as jest.Mock).mockImplementationOnce(() => {
+        throw new Error('');
+      });
       const spy = consoleErrorSpy();
 
       const result = execute('false', '/dev/null');
@@ -45,6 +47,25 @@ describe('command execution', () => {
         stdio: 'pipe',
         cwd: '/dev/null',
       });
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenNthCalledWith(
+        1,
+        '[canarist] command "%s" failed in "%s"!',
+        'false',
+        '/dev/null'
+      );
+
+      spy.mockRestore();
+    });
+
+    it('should log stderr of failing command to stderr', () => {
+      (execSync as jest.Mock).mockImplementationOnce(execSyncError);
+      const spy = consoleErrorSpy();
+
+      const result = execute('false', '/dev/null');
+
+      expect(result).toBe(false);
 
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveBeenNthCalledWith(
