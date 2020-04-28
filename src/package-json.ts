@@ -44,7 +44,7 @@ export interface PackageJSON extends Record<string, unknown> {
   bundledDependencies?: string[];
   flat?: boolean;
   resolutions?: Record<string, string>;
-  workspaces?: string[];
+  workspaces?: string[] | { nohoist?: string[]; packages?: string[] };
 
   // system https://classic.yarnpkg.com/en/docs/package-json/#toc-system
   engines?: {

@@ -54,6 +54,23 @@ const hopsPackage2Manifest = {
   },
 };
 
+const nohoistManifest = {
+  name: 'nohoist',
+  version: '1.0.0',
+  workspaces: {
+    packages: ['packages/*'],
+    nohoist: ['packages/pkg-1/react'],
+  },
+};
+
+const nohoistPkg1 = {
+  name: 'nohoist-pkg-1',
+  version: '1.0.0',
+  dependencies: {
+    react: '^16.8.0',
+  },
+};
+
 function readFileSyncMock(path: string): string {
   switch (path) {
     case '/some/directory/canarist/package.json':
@@ -66,6 +83,10 @@ function readFileSyncMock(path: string): string {
       return JSON.stringify(hopsPackage1Manifest);
     case '/some/directory/hops/packages/package-2/package.json':
       return JSON.stringify(hopsPackage2Manifest);
+    case '/some/directory/nohoist/package.json':
+      return JSON.stringify(nohoistManifest);
+    case '/some/directory/nohoist/packages/pkg-1/package.json':
+      return JSON.stringify(nohoistPkg1);
   }
   return '';
 }
@@ -79,6 +100,8 @@ function globSyncMock(pattern: string): string[] {
         '/some/directory/hops/packages/package-1/package.json',
         '/some/directory/hops/packages/package-2/package.json',
       ];
+    case 'nohoist/packages/*/package.json':
+      return ['/some/directory/hops/packages/pkg-1/package.json'];
   }
   return [];
 }
@@ -225,6 +248,56 @@ describe('createRootManifest', () => {
       'hops/demo',
       'hops/packages/*',
     ]);
+  });
+
+  it('should merge workspaces and nohoist patterns of root manifests', () => {
+    const manifest = createRootManifest(
+      partialWorkspacesConfig({
+        repositories: [
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/hops.git',
+            directory: 'hops',
+            manifest: hopsManifest,
+            packages: [
+              {
+                path: '/some/directory/hops/demo/package.json',
+                manifest: hopsDemoManifest,
+              },
+              {
+                path: '/some/directory/hops/packages/package-1/package.json',
+                manifest: hopsPackage1Manifest,
+              },
+              {
+                path: '/some/directory/hops/packages/package-2/package.json',
+                manifest: hopsPackage2Manifest,
+              },
+            ],
+          }),
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/nohoist.git',
+            directory: 'nohoist',
+            manifest: nohoistManifest,
+            packages: [
+              {
+                path: '/some/directory/nohoist/packages/pkg-1/package.json',
+                manifest: nohoistPkg1,
+              },
+            ],
+          }),
+        ],
+      })
+    );
+
+    expect(manifest.workspaces).toEqual({
+      nohoist: ['nohoist/packages/pkg-1/react'],
+      packages: [
+        'hops',
+        'hops/demo',
+        'hops/packages/*',
+        'nohoist',
+        'nohoist/packages/*',
+      ],
+    });
   });
 
   it('should merge resolutions of root manifests', () => {

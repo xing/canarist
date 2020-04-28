@@ -5,6 +5,13 @@ import mergeWith from 'lodash.mergewith';
 import type { Config } from './config';
 import type { PackageJSON } from './package-json';
 
+const hasKey = <K extends string>(
+  key: K,
+  object: unknown
+): object is Record<K, unknown> => {
+  return typeof object === 'object' && object !== null && key in object;
+};
+
 export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
     manifest: PackageJSON;
@@ -49,40 +56,60 @@ export function collectWorkspaces(config: Config): WorkspacesConfig {
 }
 
 export function createRootManifest(config: WorkspacesConfig): PackageJSON {
+  const workspaces = config.repositories.reduce((accumulator, repository) => {
+    const { workspaces } = repository.manifest;
+    const packages = Array.isArray(workspaces)
+      ? workspaces
+      : workspaces && Array.isArray(workspaces.packages)
+      ? workspaces.packages
+      : [];
+
+    return [
+      ...accumulator,
+      repository.directory,
+      ...packages.map((pattern) => join(repository.directory, pattern)),
+    ];
+  }, [] as string[]);
+
+  const nohoist = config.repositories.reduce((accumulator, repository) => {
+    const { workspaces } = repository.manifest;
+    return accumulator.concat(
+      ...(hasKey('nohoist', workspaces) && Array.isArray(workspaces.nohoist)
+        ? workspaces.nohoist.map((p) => join(repository.directory, p))
+        : [])
+    );
+  }, [] as string[]);
+
+  const resolutions = config.repositories.reduce((resolutions, repo) => {
+    if (repo.manifest.resolutions) {
+      mergeWith(
+        resolutions,
+        repo.manifest.resolutions,
+        (objValue, srcValue, key) => {
+          if (objValue && srcValue && objValue !== srcValue) {
+            console.warn(
+              '[canarist] incompatible resolutions found: "%s" is defined as "%s" and "%s"',
+              key,
+              objValue,
+              srcValue
+            );
+            return srcValue;
+          }
+        }
+      );
+    }
+    return resolutions;
+  }, {});
+
   return mergeWith(
     {
       name: 'canarist-root',
       version: '0.0.0-private',
       private: true,
-      workspaces: config.repositories
-        .map((repo) => [
-          repo.directory,
-          ...(repo.manifest.workspaces || []).map((pattern) =>
-            join(repo.directory, pattern)
-          ),
-        ])
-        .filter(Boolean)
-        .flat(),
-      resolutions: config.repositories.reduce((resolutions, repo) => {
-        if (repo.manifest.resolutions) {
-          mergeWith(
-            resolutions,
-            repo.manifest.resolutions,
-            (objValue, srcValue, key) => {
-              if (objValue && srcValue) {
-                console.warn(
-                  '[canarist] incompatible resolutions found: "%s" is defined as "%s" and "%s"',
-                  key,
-                  objValue,
-                  srcValue
-                );
-                return srcValue;
-              }
-            }
-          );
-        }
-        return resolutions;
-      }, {}),
+      workspaces: nohoist.length
+        ? { nohoist, packages: workspaces }
+        : workspaces,
+      resolutions,
     },
     config.rootManifest,
     (objValue, srcValue) => {
