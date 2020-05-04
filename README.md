@@ -8,7 +8,7 @@ canarist is a tool that allows you to combine multiple yarn workspace monorepos 
 
 This is useful if, for example, you have a tool or library that is being developed inside a monorepo and you want to test out new changes to your library in downstream projects by executing their test suites.
 
-At XING we have this automated with our CI, so that PRs to central repositories will be tested against a few downstream projects.
+At XING we have this automated within our CI, so that PRs to central repositories will be tested against a few downstream projects.
 
 _If you want to read more into how and why this tool works, check out the [overview](./docs/overview.md) (which I had prepared for a small presentation in our company)._
 
@@ -20,13 +20,13 @@ Since this is a tool for managing yarn workspaces, it is required to have `yarn`
 
 ## Quick start
 
-You can use canarist as a CLI tool, just install it globally or use npx to run it as a one-off command:
+You can use canarist as a CLI tool: Install it globally or use npx to run it as a one-off command:
 
 ```shell
 npx canarist -r . -r git@github.com:some/other.git
 ```
 
-This command will create a temporary folder and clone the repository from your current working directory (`.`) and the some/other repository from GitHub into the temporary folder and execute `yarn test` in both repositories.
+This command will create a temporary folder and clone the repository from your current working directory (`.`) and the `some/other` repository from GitHub into a temporary folder and execute `yarn test` in both repositories.
 
 ## Configuration and projects
 
@@ -85,6 +85,8 @@ into the terminal and will do the following:
 - execute `yarn --production` in `~/work/canarist-target/`
 - execute `yarn build` in `~/work/canarist-target/other`
 - execute `yarn test` in `~/work/canarist-target/my-other`
+
+_Note:_ This configuration will link all packages from all three configured repositories together.
 
 In case you want to test multiple different combinations, you can make use of projects (see below):
 
@@ -145,6 +147,8 @@ npx canarist -p other
 ```
 
 into the terminal.
+
+_Note:_ This configuration allows to link `canarist` with `my/canarist` and `some/other` with `my/other`, this is useful when you want to test changes in several different repositories without linking all of them together at once.
 
 **CLI output:**
 
