@@ -167,6 +167,19 @@ describe('normalize config', () => {
       expect(config.repositories[0].directory).toBe('canarist');
     });
 
+    it('should leave branch name blank when cloning from a local path', () => {
+      // $ canarist -r .
+      const config = normalizeConfig(
+        {
+          _: [],
+          repository: ['.'],
+        },
+        null
+      );
+
+      expect(config.repositories[0].branch).toBe('');
+    });
+
     it('should accept target directory', () => {
       // $ canarist -r . /some/dir
       const config = normalizeConfig(
@@ -303,6 +316,37 @@ describe('normalize config', () => {
         rootManifest: { devDependencies: { jest: '^25' } },
         targetDirectory: '/some/directory',
         yarnArguments: '--production=false',
+      });
+    });
+
+    it('should leave branch blank when cloning from a local path', () => {
+      // $ canarist
+      const config = normalizeConfig(
+        { _: [] },
+        {
+          filepath: '',
+          config: {
+            repositories: [
+              {
+                url: '.',
+              },
+            ],
+          },
+        }
+      );
+
+      expect(config).toEqual({
+        repositories: [
+          {
+            url: '.',
+            branch: '',
+            directory: 'canarist',
+            commands: ['yarn test'],
+          },
+        ],
+        rootManifest: {},
+        targetDirectory: '/tmp/canarist-XXXXXX',
+        yarnArguments: '',
       });
     });
 

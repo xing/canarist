@@ -44,13 +44,17 @@ export function cloneRepositories(
       `git clone ${url} ${target}`,
       `--single-branch`,
       `--no-tags`,
-      `--branch ${branch}`,
+      branch ? `--branch ${branch}` : '',
       isLocalFilePath ? '' : '--depth 1',
     ]
       .join(' ')
       .trim();
 
-    console.log('[canarist] cloning "%s#%s" into "%s"', url, branch, target);
+    console.log(
+      `[canarist] cloning "${url}${
+        branch ? '#' + branch : ''
+      }" into "${target}"`
+    );
     if (!execute(command, cwd, debug)) {
       throw new Error('Failed to clone repositories');
     }

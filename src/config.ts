@@ -72,11 +72,6 @@ function tryParse(input: string): Record<string, unknown> {
   }
 }
 
-function normalizeDirectoryName(url: string): string {
-  const { name } = gitUrlParse(url);
-  return name === '.' ? basename(resolve(name)) : name;
-}
-
 function normalizeRepository(
   input: string | RepositoryArguments | Partial<RepositoryConfig>
 ): RepositoryConfig {
@@ -84,10 +79,11 @@ function normalizeRepository(
   const defaultCommands = ['yarn test'];
 
   if (typeof input === 'string') {
+    const { name } = gitUrlParse(input);
     return {
       url: input,
-      branch: defaultBranch,
-      directory: normalizeDirectoryName(input),
+      branch: name === '.' ? '' : defaultBranch,
+      directory: name === '.' ? basename(resolve(name)) : name,
       commands: defaultCommands,
     };
   }
@@ -95,12 +91,23 @@ function normalizeRepository(
   const url = Array.isArray((input as RepositoryArguments)._)
     ? (input as RepositoryArguments)._[0]
     : input.url;
-  const branch = input.branch || defaultBranch;
+  const { name } = gitUrlParse(url);
+  const directory =
+    typeof input.directory === 'string'
+      ? input.directory
+      : name === '.'
+      ? basename(resolve(name))
+      : name;
+  const branch =
+    typeof input.branch === 'string'
+      ? input.branch
+      : name === '.'
+      ? ''
+      : defaultBranch;
   const command =
     typeof (input as RepositoryArguments).command === 'undefined'
       ? input.commands
       : (input as RepositoryArguments).command;
-  const directory = normalizeDirectoryName(input.directory || url);
   const commands = Array.isArray(command)
     ? command
     : typeof command === 'string'

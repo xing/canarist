@@ -174,6 +174,30 @@ describe('command execution', () => {
       );
     });
 
+    it('should not add `--branch` argument when branch is empty', () => {
+      cloneRepositories(
+        partialConfig({
+          repositories: [
+            partialRepositoryConfig({
+              url: '.',
+              directory: 'canarist',
+              branch: '',
+            }),
+          ],
+        }),
+        '/cwd'
+      );
+
+      expect(execSync).toHaveBeenCalledWith(
+        [
+          'git clone . /some/directory/canarist',
+          '--single-branch',
+          '--no-tags',
+        ].join(' '),
+        { stdio: 'pipe', cwd: '/cwd' }
+      );
+    });
+
     it('should throw an error if cloning failed', () => {
       (execSync as jest.Mock).mockImplementationOnce(execSyncError);
       const spy = consoleErrorSpy();
