@@ -130,6 +130,8 @@ export function alignWorkspaceVersions(
       return {
         path: join(config.targetDirectory, repo.directory, 'package.json'),
         manifest: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           version: '0.0.0-test',
           ...manifest,
         },
