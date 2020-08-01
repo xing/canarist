@@ -102,7 +102,7 @@
     ]
   },
   "dependencies": {
-    "cosmiconfig": "^6.0.0",
+    "cosmiconfig": "^7.0.0",
     "debug": "^4.1.1",
     "fast-glob": "^3.2.2",
     "git-url-parse": "^11.1.2",
