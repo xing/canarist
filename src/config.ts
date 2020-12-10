@@ -45,7 +45,7 @@ interface RepositoryArguments extends minimist.ParsedArgs {
 }
 
 export interface Arguments extends minimist.ParsedArgs {
-  help?: boolean;
+  help: boolean;
   repository?: string | (string | RepositoryArguments)[];
   'root-manifest'?: string;
   'yarn-arguments'?: string;
