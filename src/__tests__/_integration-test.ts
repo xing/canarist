@@ -7,8 +7,8 @@ function canarist(
   ...args: string[]
 ): {
   exitCode: number;
-  stdout: string | null;
-  stderr: string | null;
+  stdout: string;
+  stderr: string;
 } {
   try {
     const stdout = execSync(`node ${pathToBin} ${args.join(' ')}`, {
@@ -17,14 +17,14 @@ function canarist(
 
     return {
       exitCode: 0,
-      stdout: stdout ? stdout.toString() : null,
-      stderr: null,
+      stdout: stdout.toString(),
+      stderr: '',
     };
   } catch (error) {
     return {
       exitCode: error.status,
-      stdout: error.stdout ? error.stdout.toString() : null,
-      stderr: error.stderr ? error.stderr.toString() : null,
+      stdout: error.stdout.toString(),
+      stderr: error.stderr.toString(),
     };
   }
 }
