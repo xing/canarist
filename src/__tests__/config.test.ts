@@ -1,5 +1,6 @@
 import { mkdtempSync } from 'fs';
 import { normalizeConfig } from '../config';
+import type { Config } from '../config';
 
 jest.mock('fs');
 
@@ -32,7 +33,7 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.repositories).toEqual([
+      expect(config.repositories).toEqual<Config['repositories']>([
         {
           url: 'a-repo',
           branch: 'master',
@@ -56,7 +57,7 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.repositories).toEqual([
+      expect(config.repositories).toEqual<Config['repositories']>([
         {
           url: 'https://github.com/a/repo.git',
           branch: 'master',
@@ -80,7 +81,7 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.repositories).toEqual([
+      expect(config.repositories).toEqual<Config['repositories']>([
         {
           url: 'a-repo',
           branch: 'master',
@@ -257,7 +258,9 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.rootManifest).toEqual({ devDependencies: { jest: '^25' } });
+      expect(config.rootManifest).toEqual<Config['rootManifest']>({
+        devDependencies: { jest: '^25' },
+      });
     });
 
     it('should default root manifest additions to an empty object', () => {
@@ -272,7 +275,7 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.rootManifest).toEqual({});
+      expect(config.rootManifest).toEqual<Config['rootManifest']>({});
     });
 
     it('should not fail on invalid root manifest additions', () => {
@@ -288,7 +291,7 @@ describe('normalize config', () => {
         null
       );
 
-      expect(config.rootManifest).toEqual({});
+      expect(config.rootManifest).toEqual<Config['rootManifest']>({});
     });
 
     it('should accept additional yarn arguments', () => {
@@ -361,7 +364,7 @@ describe('normalize config', () => {
         }
       );
 
-      expect(config).toEqual({
+      expect(config).toEqual<Config>({
         repositories: [
           {
             url: 'a-repo',
@@ -393,7 +396,7 @@ describe('normalize config', () => {
         }
       );
 
-      expect(config).toEqual({
+      expect(config).toEqual<Config>({
         repositories: [
           {
             url: '.',
@@ -475,7 +478,7 @@ describe('normalize config', () => {
         }
       );
 
-      expect(config).toEqual({
+      expect(config).toEqual<Config>({
         repositories: [
           {
             url: 'a-repo',
@@ -518,7 +521,7 @@ describe('normalize config', () => {
         }
       );
 
-      expect(config).toEqual({
+      expect(config).toEqual<Config>({
         repositories: [
           {
             url: 'a-repo',
@@ -562,7 +565,7 @@ describe('normalize config', () => {
       }
     );
 
-    expect(config).toEqual({
+    expect(config).toEqual<Config>({
       repositories: [
         {
           url: 'b-repo',
