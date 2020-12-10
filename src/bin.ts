@@ -125,44 +125,48 @@ try {
 
   const config = invokeCLI(process.argv.slice(2));
 
-  cloneRepositories(config, process.cwd(), debug);
+  try {
+    cloneRepositories(config, process.cwd(), debug);
 
-  const workspacesConfig = collectWorkspaces(config);
+    const workspacesConfig = collectWorkspaces(config);
 
-  const manifests = [
-    {
-      path: join(config.targetDirectory, 'package.json'),
-      manifest: createRootManifest(workspacesConfig),
-    },
-    ...alignWorkspaceVersions(workspacesConfig),
-  ];
+    const manifests = [
+      {
+        path: join(config.targetDirectory, 'package.json'),
+        manifest: createRootManifest(workspacesConfig),
+      },
+      ...alignWorkspaceVersions(workspacesConfig),
+    ];
 
-  // todo: allow to change pinned versions to semver ranges
+    // todo: allow to change pinned versions to semver ranges
 
-  manifests.forEach(({ path, manifest }) => {
-    const content = existsSync(path) ? readFileSync(path, 'utf-8') : '}\n';
-    const finalNewLine = content.substr(content.lastIndexOf('}') + 1);
-    writeFileSync(path, JSON.stringify(manifest, null, 2) + finalNewLine);
-  });
+    manifests.forEach(({ path, manifest }) => {
+      const content = existsSync(path) ? readFileSync(path, 'utf-8') : '}\n';
+      const finalNewLine = content.substr(content.lastIndexOf('}') + 1);
+      writeFileSync(path, JSON.stringify(manifest, null, 2) + finalNewLine);
+    });
 
-  // todo: allow to configure which files should be merged?
-  // todo: might need to get smarter on how to merge .npmrc files
-  config.repositories.forEach((repo) => {
-    const npmrcPath = join(config.targetDirectory, repo.directory, '.npmrc');
+    // todo: allow to configure which files should be merged?
+    // todo: might need to get smarter on how to merge .npmrc files
+    config.repositories.forEach((repo) => {
+      const npmrcPath = join(config.targetDirectory, repo.directory, '.npmrc');
 
-    if (existsSync(npmrcPath)) {
-      appendFileSync(
-        join(config.targetDirectory, '.npmrc'),
-        readFileSync(npmrcPath) + '\n'
-      );
-    }
-  });
+      if (existsSync(npmrcPath)) {
+        appendFileSync(
+          join(config.targetDirectory, '.npmrc'),
+          readFileSync(npmrcPath) + '\n'
+        );
+      }
+    });
 
-  yarn(config, debug);
+    yarn(config, debug);
 
-  executeCommands(config, debug);
+    executeCommands(config, debug);
 
-  console.log('[canarist] finished successfully!');
+    console.log('[canarist] finished successfully!');
+  } finally {
+    //
+  }
 } catch (err) {
   process.exitCode = 1;
   console.error('[canarist] exited with error "%s"', err.message);
