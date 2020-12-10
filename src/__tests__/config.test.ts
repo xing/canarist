@@ -40,6 +40,30 @@ describe('normalize config', () => {
       ]);
     });
 
+    it('should decrypt encrypted repository url', () => {
+      process.env.CANARIST_ENCRYPTION_KEY =
+        'C7DA20FEF7B7E363043C75F7D580A86E3997F0A58A15F9977814F310835DC2FB';
+      // $ canarist -r enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=
+      const config = normalizeConfig(
+        {
+          _: [],
+          repository: 'enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=',
+        },
+        null
+      );
+
+      expect(config.repositories).toEqual([
+        {
+          url: 'https://github.com/a/repo.git',
+          branch: 'master',
+          directory: 'repo',
+          commands: ['yarn test'],
+        },
+      ]);
+
+      process.env.CANARIST_ENCRYPTION_KEY = undefined;
+    });
+
     it('should normalize arguments for multiple repositories', () => {
       // $ canarist -r a-repo -r b-repo
       const config = normalizeConfig(

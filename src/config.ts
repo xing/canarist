@@ -1,3 +1,4 @@
+import { createDecipheriv } from 'crypto';
 import { mkdtempSync } from 'fs';
 import { tmpdir } from 'os';
 import { basename, join, resolve } from 'path';
@@ -72,6 +73,36 @@ function tryParse(input: string): Record<string, unknown> {
   }
 }
 
+/**
+ * Decrypts a URL that has been encrypted using:
+ * `echo -n "https://url" | openssl enc -a -pbkdf2 -nosalt -iv 0 -e -aes-256-cbc -K $CANARIST_ENCRYPTION_KEY`
+ * The URL must start with `enc:$base64value` and the env var CANARIST_ENCRYPTION_KEY
+ * must be set to the encryption key.
+ * Note: We're using -nosalt and an iv value of 0 here, because we don't care if
+ * two identical URLs create the same output.
+ */
+function decryptUrl(input: string): string {
+  const prefix = 'enc:';
+  if (!input.startsWith(prefix)) {
+    return input;
+  }
+
+  const keyString = `${process.env.CANARIST_ENCRYPTION_KEY}`;
+  if (!/^[0-9a-fA-F]{64}$/.test(keyString)) {
+    throw new Error(`CANARIST_ENCRYPTION_KEY is not 64 hex characters`);
+  }
+
+  const key = Buffer.from(keyString, 'hex');
+  delete process.env.CANARIST_ENCRYPTION_KEY;
+
+  const decipher = createDecipheriv('aes-256-cbc', key, Buffer.alloc(16, 0));
+
+  return (
+    decipher.update(input.slice(prefix.length), 'base64', 'utf8') +
+    decipher.final('utf8')
+  );
+}
+
 function normalizeRepository(
   input: string | RepositoryArguments | Partial<RepositoryConfig>
 ): RepositoryConfig {
@@ -79,18 +110,21 @@ function normalizeRepository(
   const defaultCommands = ['yarn test'];
 
   if (typeof input === 'string') {
-    const { name } = gitUrlParse(input);
+    const url = decryptUrl(input);
+    const { name } = gitUrlParse(url);
     return {
-      url: input,
+      url,
       branch: name === '.' ? '' : defaultBranch,
       directory: name === '.' ? basename(resolve(name)) : name,
       commands: defaultCommands,
     };
   }
 
-  const url = Array.isArray((input as RepositoryArguments)._)
-    ? (input as RepositoryArguments)._[0]
-    : input.url;
+  const url = decryptUrl(
+    Array.isArray((input as RepositoryArguments)._)
+      ? (input as RepositoryArguments)._[0]
+      : input.url
+  );
   const { name } = gitUrlParse(url);
   const directory =
     typeof input.directory === 'string'
@@ -115,7 +149,7 @@ function normalizeRepository(
     : defaultCommands;
 
   return {
-    url: url,
+    url,
     branch,
     directory,
     commands,
