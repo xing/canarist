@@ -43,6 +43,24 @@ describe('normalize config', () => {
       ]);
     });
 
+    it('should throw on invalid decryption key', () => {
+      process.env.CANARIST_ENCRYPTION_KEY = 'zyxw';
+      // $ canarist -r enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=
+      expect(() => {
+        normalizeConfig(
+          {
+            _: [],
+            help: false,
+            clean: true,
+            repository: 'enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=',
+          },
+          null
+        );
+      }).toThrow(/CANARIST_ENCRYPTION_KEY is not 64 hex characters/);
+
+      process.env.CANARIST_ENCRYPTION_KEY = undefined;
+    });
+
     it('should decrypt encrypted repository url', () => {
       process.env.CANARIST_ENCRYPTION_KEY =
         'C7DA20FEF7B7E363043C75F7D580A86E3997F0A58A15F9977814F310835DC2FB';
