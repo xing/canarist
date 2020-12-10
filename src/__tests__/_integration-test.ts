@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import { existsSync } from 'fs';
 
 // eslint-disable-next-line node/no-missing-require
 const pathToBin = require.resolve('canarist/dist/bin.js');
@@ -40,8 +41,27 @@ describe('integration tests', () => {
 
     expect(exitCode).toBe(0);
 
+    const [, folder] =
+      stdout.match(/\[canarist\] cloning "[^]+" into "([^"]+)"/) || [];
+    expect(existsSync(folder)).toBe(false);
+
     expect(stdout).toContain('[canarist] executing command "yarn build"');
     expect(stdout).toContain('[canarist] executing command "yarn test"');
+    expect(stdout).toContain('[canarist] finished successfully!');
+  });
+  it('should keep the target folder if --no-clean is set', (): void => {
+    const { exitCode, stdout } = canarist(
+      `-r [${repository} -d folder-a -b monorepo-a -c]`,
+      `-r [${repository} -d folder-b -b monorepo-b -c]`,
+      `--no-clean`
+    );
+
+    expect(exitCode).toBe(0);
+
+    const [, folder] =
+      stdout.match(/\[canarist\] cloning "[^]+" into "([^"]+)"/) || [];
+    expect(existsSync(folder)).toBe(true);
+
     expect(stdout).toContain('[canarist] finished successfully!');
   });
 
@@ -52,6 +72,10 @@ describe('integration tests', () => {
     );
 
     expect(exitCode).toBe(1);
+
+    const [, folder] =
+      stdout.match(/\[canarist\] cloning "[^]+" into "([^"]+)"/) || [];
+    expect(existsSync(folder)).toBe(false);
 
     expect(stdout).toContain(
       '[canarist] executing command "yarn run not-available"'
