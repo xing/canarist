@@ -3,6 +3,7 @@
 
 import { join } from 'path';
 import { writeFileSync, existsSync, appendFileSync, readFileSync } from 'fs';
+import { sync as rimrafSync } from 'rimraf';
 import { cosmiconfigSync } from 'cosmiconfig';
 import type { Opts } from 'minimist';
 import createDebug from 'debug';
@@ -165,7 +166,7 @@ try {
 
     console.log('[canarist] finished successfully!');
   } finally {
-    //
+    rimrafSync(config.targetDirectory);
   }
 } catch (err) {
   process.exitCode = 1;
