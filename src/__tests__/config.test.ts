@@ -16,7 +16,7 @@ describe('normalize config', () => {
     it('should throw an error if no arguments are passed', () => {
       // $ canarist
       expect(() => {
-        normalizeConfig({ _: [] }, null);
+        normalizeConfig({ _: [], help: false }, null);
       }).toThrow(/No repositories are passed through arguments/);
     });
 
@@ -25,6 +25,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: 'a-repo',
         },
         null
@@ -47,6 +48,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: 'enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=',
         },
         null
@@ -69,6 +71,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: ['a-repo', 'b-repo'],
         },
         null
@@ -95,6 +98,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: [
             {
               _: ['a-repo'],
@@ -113,6 +117,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: [
             {
               _: ['a-repo'],
@@ -131,6 +136,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: [
             {
               _: ['a-repo'],
@@ -149,6 +155,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: [
             {
               _: ['a-repo'],
@@ -170,6 +177,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: ['https://github.com/xing/canarist.git'],
         },
         null
@@ -183,6 +191,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: ['.'],
         },
         null
@@ -196,6 +205,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: ['.'],
         },
         null
@@ -207,7 +217,7 @@ describe('normalize config', () => {
     it('should accept target directory', () => {
       // $ canarist -r . /some/dir
       const config = normalizeConfig(
-        { _: ['/some/dir'], repository: '.' },
+        { _: ['/some/dir'], help: false, repository: '.' },
         null
       );
 
@@ -216,7 +226,10 @@ describe('normalize config', () => {
 
     it('should default target directory to /tmp/canarist', () => {
       // $ canarist -r .
-      const config = normalizeConfig({ _: [], repository: '.' }, null);
+      const config = normalizeConfig(
+        { _: [], help: false, repository: '.' },
+        null
+      );
 
       expect(config.targetDirectory).toBe('/tmp/canarist-XXXXXX');
     });
@@ -226,6 +239,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: '.',
           'root-manifest': '{"devDependencies":{"jest":"^25"}}',
         },
@@ -240,6 +254,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: '.',
         },
         null
@@ -253,6 +268,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: '.',
           'root-manifest': '{"devDepen',
         },
@@ -267,6 +283,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: '.',
           'yarn-arguments': '--production=false',
         },
@@ -281,6 +298,7 @@ describe('normalize config', () => {
       const config = normalizeConfig(
         {
           _: [],
+          help: false,
           repository: '.',
         },
         null
@@ -295,7 +313,7 @@ describe('normalize config', () => {
       // $ canarist
       expect(() => {
         normalizeConfig(
-          { _: [] },
+          { _: [], help: false },
           {
             filepath: '',
             config: {
@@ -309,7 +327,7 @@ describe('normalize config', () => {
     it('should return config if no projects are configured', () => {
       // $ canarist
       const config = normalizeConfig(
-        { _: [] },
+        { _: [], help: false },
         {
           filepath: '',
           config: {
@@ -346,7 +364,7 @@ describe('normalize config', () => {
     it('should leave branch blank when cloning from a local path', () => {
       // $ canarist
       const config = normalizeConfig(
-        { _: [] },
+        { _: [], help: false },
         {
           filepath: '',
           config: {
@@ -378,7 +396,7 @@ describe('normalize config', () => {
       // $ canarist
       expect(() => {
         normalizeConfig(
-          { _: [] },
+          { _: [], help: false },
           {
             filepath: '',
             config: {
@@ -393,7 +411,7 @@ describe('normalize config', () => {
       // $ canarist -p a-project
       expect(() => {
         normalizeConfig(
-          { _: [], project: 'a-project' },
+          { _: [], help: false, project: 'a-project' },
           {
             filepath: '',
             config: {
@@ -413,7 +431,7 @@ describe('normalize config', () => {
       // $ canarist -p a-project
       expect(() => {
         normalizeConfig(
-          { _: [], project: 'a-project' },
+          { _: [], help: false, project: 'a-project' },
           {
             filepath: '',
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -426,7 +444,7 @@ describe('normalize config', () => {
     it('should return config of selected project with defaults', () => {
       // $ canarist -p a-project
       const config = normalizeConfig(
-        { _: [], project: 'a-project' },
+        { _: [], help: false, project: 'a-project' },
         {
           filepath: '',
           config: {
@@ -458,7 +476,7 @@ describe('normalize config', () => {
     it('should return config of selected project', () => {
       // $ canarist -p a-project
       const config = normalizeConfig(
-        { _: [], project: 'a-project' },
+        { _: [], help: false, project: 'a-project' },
         {
           filepath: '',
           config: {
@@ -501,7 +519,7 @@ describe('normalize config', () => {
   it('should give precedence to CLI config', () => {
     // $ canarist -r b-repo
     const config = normalizeConfig(
-      { _: [], repository: 'b-repo' },
+      { _: [], help: false, repository: 'b-repo' },
       {
         filepath: '',
         config: {

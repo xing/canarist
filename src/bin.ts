@@ -95,7 +95,7 @@ Examples:
 }
 
 function invokeCLI(argv: string[]): Config {
-  const args: Arguments = subarg(argv, minimistConfig);
+  const args = subarg(argv, minimistConfig) as Arguments;
   const config: null | CosmiconfigResult = cosmiconfigSync('canarist').search();
 
   // todo: how about a --no-install or --no-commands flag to enable quick debugging?
