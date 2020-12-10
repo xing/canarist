@@ -213,10 +213,16 @@ export function normalizeConfig(
   } else if (Array.isArray(argv.repository)) {
     repositories.push(...argv.repository.map(normalizeRepository));
   } else if (argv.project && config && isProjectsConfig(config.config)) {
+    /* istanbul ignore else */ // this can't happen because of the checks at the
+    // beginning of this function
     if (project) {
       repositories.push(...project.repositories.map(normalizeRepository));
     }
-  } else if (config && isSingleConfig(config.config)) {
+    // we can safely ignore the missing else case, because of the checks above
+  } /* istanbul ignore else */ else if (
+    config &&
+    isSingleConfig(config.config)
+  ) {
     repositories.push(...config.config.repositories.map(normalizeRepository));
   }
 
