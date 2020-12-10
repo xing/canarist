@@ -8,6 +8,7 @@ export function partialConfig({
   rootManifest = {},
 }: Partial<Config> = {}): Config {
   return {
+    clean: true,
     repositories,
     targetDirectory,
     yarnArguments,
@@ -36,6 +37,7 @@ export function partialWorkspacesConfig({
   rootManifest = {},
 }: Partial<WorkspacesConfig> = {}): WorkspacesConfig {
   return {
+    clean: true,
     repositories,
     targetDirectory,
     yarnArguments,

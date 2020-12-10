@@ -15,6 +15,7 @@ export interface RepositoryConfig {
 }
 
 export interface Config {
+  clean: boolean;
   targetDirectory: string;
   rootManifest: Partial<PackageJSON>;
   yarnArguments: string;
@@ -46,6 +47,7 @@ interface RepositoryArguments extends minimist.ParsedArgs {
 
 export interface Arguments extends minimist.ParsedArgs {
   help: boolean;
+  clean: boolean;
   repository?: string | (string | RepositoryArguments)[];
   'root-manifest'?: string;
   'yarn-arguments'?: string;
@@ -219,6 +221,7 @@ export function normalizeConfig(
   }
 
   return {
+    clean: argv.clean,
     targetDirectory,
     rootManifest,
     yarnArguments,

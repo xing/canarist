@@ -31,7 +31,7 @@ const minimistConfig: Opts = {
     'yarn-arguments': ['y'],
     project: ['p'],
   },
-  boolean: ['help'],
+  boolean: ['help', 'clean'],
   string: [
     'repository',
     'branch',
@@ -41,6 +41,9 @@ const minimistConfig: Opts = {
     'yarn-arguments',
     'project',
   ],
+  default: {
+    clean: true,
+  },
 };
 
 function printUsage(): void {
@@ -63,6 +66,8 @@ Options:
         Additional arguments that should be passed to the "yarn install" command.
     --project, -p
         The name of a project to execute in a multi-project configuration.
+    --clean
+        Remove the target directory after canarist exits. Default: true
 
 Examples:
     $ canarist -r git@github.com:xing/canarist.git -r git@github.com:some/other.git
@@ -166,7 +171,9 @@ try {
 
     console.log('[canarist] finished successfully!');
   } finally {
-    rimrafSync(config.targetDirectory);
+    if (config.clean) {
+      rimrafSync(config.targetDirectory);
+    }
   }
 } catch (err) {
   process.exitCode = 1;
