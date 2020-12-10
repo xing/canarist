@@ -19,12 +19,14 @@ export function subarg(
       if (--level > 0) continue;
 
       const sub = args.slice(index, i + 1);
+      /* istanbul ignore else */
       if (typeof sub[0] === 'string') {
         sub[0] = sub[0].replace(/^\[/, '');
       }
       if (sub[0] === '') sub.shift();
 
       const n = sub.length - 1;
+      /* istanbul ignore else */
       if (typeof sub[n] === 'string') {
         sub[n] = sub[n].replace(/\]$/, '');
       }
