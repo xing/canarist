@@ -16,6 +16,7 @@ export interface RepositoryConfig {
 
 export interface Config {
   clean: boolean;
+  unpin: boolean;
   targetDirectory: string;
   rootManifest: Partial<PackageJSON>;
   yarnArguments: string;
@@ -48,6 +49,7 @@ interface RepositoryArguments extends minimist.ParsedArgs {
 export interface Arguments extends minimist.ParsedArgs {
   help: boolean;
   clean: boolean;
+  unpin?: boolean;
   repository?: string | (string | RepositoryArguments)[];
   'root-manifest'?: string;
   'yarn-arguments'?: string;
@@ -207,6 +209,19 @@ export function normalizeConfig(
       ((isSingleConfig(config.config) && config.config.yarnArguments) ||
         (project && project.yarnArguments))) ||
     '';
+  let unpin = false;
+  if (
+    config &&
+    isSingleConfig(config.config) &&
+    typeof config.config.unpin === 'boolean'
+  ) {
+    unpin = config.config.unpin;
+  } else if (project && typeof project.unpin === 'boolean') {
+    unpin = project.unpin;
+  }
+  if (typeof argv.unpin === 'boolean') {
+    unpin = argv.unpin;
+  }
 
   if (typeof argv.repository === 'string') {
     repositories.push(normalizeRepository(argv.repository));
@@ -222,6 +237,7 @@ export function normalizeConfig(
 
   return {
     clean: argv.clean,
+    unpin: unpin,
     targetDirectory,
     rootManifest,
     yarnArguments,

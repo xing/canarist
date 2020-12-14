@@ -377,6 +377,7 @@ describe('normalize config', () => {
         targetDirectory: '/some/directory',
         yarnArguments: '--production=false',
         clean: true,
+        unpin: false,
       });
     });
 
@@ -409,6 +410,7 @@ describe('normalize config', () => {
         targetDirectory: '/tmp/canarist-XXXXXX',
         yarnArguments: '',
         clean: true,
+        unpin: false,
       });
     });
 
@@ -491,6 +493,7 @@ describe('normalize config', () => {
         targetDirectory: '/tmp/canarist-XXXXXX',
         yarnArguments: '',
         clean: true,
+        unpin: false,
       });
     });
 
@@ -534,6 +537,7 @@ describe('normalize config', () => {
         targetDirectory: '/some/directory',
         yarnArguments: '--production=false',
         clean: true,
+        unpin: false,
       });
     });
   });
@@ -578,6 +582,7 @@ describe('normalize config', () => {
       targetDirectory: '/tmp/canarist-XXXXXX',
       yarnArguments: '',
       clean: true,
+      unpin: false,
     });
   });
 });

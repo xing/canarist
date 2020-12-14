@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import glob from 'fast-glob';
+import semver from 'semver';
 import mergeWith from 'lodash.mergewith';
 import type { Config } from './config';
 import type { PackageJSON } from './package-json';
@@ -11,6 +12,8 @@ const hasKey = <K extends string>(
 ): object is Record<K, unknown> => {
   return typeof object === 'object' && object !== null && key in object;
 };
+
+type VersionMap = Record<string, string>;
 
 export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
@@ -122,7 +125,8 @@ export function createRootManifest(config: WorkspacesConfig): PackageJSON {
 }
 
 export function alignWorkspaceVersions(
-  config: WorkspacesConfig
+  config: WorkspacesConfig,
+  options: { unpin?: boolean } = {}
 ): { path: string; manifest: PackageJSON }[] {
   const packages = [
     ...config.repositories.map((repo) => {
@@ -149,26 +153,59 @@ export function alignWorkspaceVersions(
       .flat(),
   ];
 
-  const versions = packages.reduce(
-    (versions: { [name: string]: string }, pkg) => {
-      versions[pkg.manifest.name] = pkg.manifest.version;
-      return versions;
-    },
-    {}
-  );
+  const directDependencyTypes = [
+    'dependencies',
+    'devDependencies',
+    'optionalDependencies',
+  ] as const;
+
+  const allDependencyTypes = [
+    ...directDependencyTypes,
+    'peerDependencies',
+  ] as const;
+
+  const workspacePackages = packages.reduce((versions: VersionMap, pkg) => {
+    versions[pkg.manifest.name] = pkg.manifest.version;
+    return versions;
+  }, {});
+
+  const dependencyVersions = packages.reduce((versions: VersionMap, pkg) => {
+    directDependencyTypes
+      .flatMap((type) => Object.entries(pkg.manifest[type] || {}))
+      .filter(([name]) => !(name in workspacePackages))
+      .forEach(([name, range]) => {
+        const minVersion = semver.minVersion(range)?.version ?? '0.0.0';
+        versions[name] =
+          versions[name] && semver.gt(versions[name], minVersion)
+            ? versions[name]
+            : minVersion;
+      });
+
+    return versions;
+  }, {});
+
+  if (options.unpin) {
+    packages.forEach((pkg) => {
+      directDependencyTypes.forEach((type) => {
+        Object.keys(pkg.manifest[type] || {})
+          .filter((name) => name in dependencyVersions)
+          .forEach((name) => {
+            const deps = pkg.manifest[type];
+            if (deps) {
+              deps[name] = `^${dependencyVersions[name]}`;
+            }
+          });
+      });
+    });
+  }
 
   return packages.map((pkg) => {
-    ([
-      'dependencies',
-      'devDependencies',
-      'peerDependencies',
-      'optionalDependencies',
-    ] as const).forEach((type) => {
+    allDependencyTypes.forEach((type) => {
       const names = Object.keys(pkg.manifest[type] || {});
       names.forEach((name) => {
         const dependencies = pkg.manifest[type];
-        if (dependencies && name in versions) {
-          dependencies[name] = versions[name];
+        if (dependencies && name in workspacePackages) {
+          dependencies[name] = workspacePackages[name];
         }
       });
     });

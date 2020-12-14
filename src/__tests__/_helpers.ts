@@ -13,6 +13,7 @@ export function partialConfig({
     targetDirectory,
     yarnArguments,
     rootManifest,
+    unpin: false,
   };
 }
 
@@ -42,6 +43,7 @@ export function partialWorkspacesConfig({
     targetDirectory,
     yarnArguments,
     rootManifest,
+    unpin: false,
   };
 }
 

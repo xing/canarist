@@ -30,6 +30,7 @@ const minimistConfig: Opts = {
     'root-manifest': ['m'],
     'yarn-arguments': ['y'],
     project: ['p'],
+    unpin: ['u'],
   },
   boolean: ['help', 'clean'],
   string: [
@@ -141,7 +142,7 @@ try {
         path: join(config.targetDirectory, 'package.json'),
         manifest: createRootManifest(workspacesConfig),
       },
-      ...alignWorkspaceVersions(workspacesConfig),
+      ...alignWorkspaceVersions(workspacesConfig, { unpin: config.unpin }),
     ];
 
     // todo: allow to change pinned versions to semver ranges

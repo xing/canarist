@@ -18,6 +18,9 @@ jest.mock('fast-glob');
 const canaristManifest = {
   name: 'canarist',
   version: '1.0.0',
+  dependencies: {
+    'left-pad': '^1.0.0',
+  },
   resolutions: {
     jest: '^24.0.0',
   },
@@ -40,13 +43,16 @@ const hopsDemoManifest = {
 const hopsPackage1Manifest = {
   name: 'package-1',
   version: '1.0.0',
+  dependencies: {
+    'left-pad': '0.0.1',
+  },
 };
 
 const hopsPackage2Manifest = {
   name: 'package-2',
   version: '1.0.0',
   dependencies: {
-    'left-pad': '0.0.1',
+    'left-pad': '1.1.0',
   },
   devDependencies: {
     canarist: '^0.0.1',
@@ -407,6 +413,68 @@ describe('alignWorkspaceVersions', () => {
         path: '/some/directory/hops/packages/package-2/package.json',
         manifest: {
           ...hopsPackage2Manifest,
+          devDependencies: { canarist: '1.0.0', 'package-1': '1.0.0' },
+        },
+      },
+    ]);
+  });
+
+  it('should allow to unpin dependencies with the same major version', () => {
+    const manifests = alignWorkspaceVersions(
+      partialWorkspacesConfig({
+        repositories: [
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/canarist.git',
+            directory: 'canarist',
+            manifest: canaristManifest,
+          }),
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/hops.git',
+            directory: 'hops',
+            manifest: hopsManifest,
+            packages: [
+              {
+                path: '/some/directory/hops/packages/package-1/package.json',
+                manifest: hopsPackage1Manifest,
+              },
+              {
+                path: '/some/directory/hops/packages/package-2/package.json',
+                manifest: hopsPackage2Manifest,
+              },
+            ],
+          }),
+        ],
+      }),
+      { unpin: true }
+    );
+
+    expect(manifests).toEqual([
+      {
+        path: '/some/directory/canarist/package.json',
+        manifest: {
+          ...canaristManifest,
+          dependencies: {
+            ...canaristManifest.dependencies,
+            'left-pad': '^1.1.0',
+          },
+        },
+      },
+      {
+        path: '/some/directory/hops/package.json',
+        manifest: hopsManifest,
+      },
+      {
+        path: '/some/directory/hops/packages/package-1/package.json',
+        manifest: hopsPackage1Manifest,
+      },
+      {
+        path: '/some/directory/hops/packages/package-2/package.json',
+        manifest: {
+          ...hopsPackage2Manifest,
+          dependencies: {
+            ...hopsPackage2Manifest.dependencies,
+            'left-pad': '^1.1.0',
+          },
           devDependencies: { canarist: '1.0.0', 'package-1': '1.0.0' },
         },
       },
