@@ -69,6 +69,31 @@ describe('normalize config', () => {
       process.env.CANARIST_ENCRYPTION_KEY = undefined;
     });
 
+    it('should ignore repositories that cannot be decrypted', () => {
+      // $ canarist -r a-repo -r enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=
+      const config = normalizeConfig(
+        {
+          _: [],
+          help: false,
+          clean: true,
+          repository: [
+            'a-repo',
+            'enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=',
+          ],
+        },
+        null
+      );
+
+      expect(config.repositories).toEqual<Config['repositories']>([
+        {
+          url: 'a-repo',
+          branch: 'master',
+          directory: 'a-repo',
+          commands: ['yarn test'],
+        },
+      ]);
+    });
+
     it('should normalize arguments for multiple repositories', () => {
       // $ canarist -r a-repo -r b-repo
       const config = normalizeConfig(

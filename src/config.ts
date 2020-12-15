@@ -209,15 +209,69 @@ export function normalizeConfig(
     '';
 
   if (typeof argv.repository === 'string') {
-    repositories.push(normalizeRepository(argv.repository));
+    try {
+      repositories.push(normalizeRepository(argv.repository));
+    } catch (error) {
+      console.warn(
+        `[canarist] could not parse repository config from: "${argv.repository}"`,
+        error
+      );
+    }
   } else if (Array.isArray(argv.repository)) {
-    repositories.push(...argv.repository.map(normalizeRepository));
+    repositories.push(
+      ...argv.repository
+        .map((repo) => {
+          try {
+            return normalizeRepository(repo);
+          } catch (error) {
+            console.warn(
+              `[canarist] could not parse repository config from:`,
+              repo,
+              error
+            );
+            return undefined;
+          }
+        })
+        .filter((repo): repo is RepositoryConfig => typeof repo !== 'undefined')
+    );
   } else if (argv.project && config && isProjectsConfig(config.config)) {
     if (project) {
-      repositories.push(...project.repositories.map(normalizeRepository));
+      repositories.push(
+        ...project.repositories
+          .map((repo) => {
+            try {
+              return normalizeRepository(repo);
+            } catch (error) {
+              console.warn(
+                `[canarist] could not parse repository config from:`,
+                repo,
+                error
+              );
+              return undefined;
+            }
+          })
+          .filter(
+            (repo): repo is RepositoryConfig => typeof repo !== 'undefined'
+          )
+      );
     }
   } else if (config && isSingleConfig(config.config)) {
-    repositories.push(...config.config.repositories.map(normalizeRepository));
+    repositories.push(
+      ...config.config.repositories
+        .map((repo) => {
+          try {
+            return normalizeRepository(repo);
+          } catch (error) {
+            console.warn(
+              `[canarist] could not parse repository config from:`,
+              repo,
+              error
+            );
+            return undefined;
+          }
+        })
+        .filter((repo): repo is RepositoryConfig => typeof repo !== 'undefined')
+    );
   }
 
   return {
