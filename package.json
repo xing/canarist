@@ -70,8 +70,7 @@
       "plugin:@typescript-eslint/eslint-recommended",
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended",
-      "plugin:node/recommended",
-      "prettier/@typescript-eslint"
+      "plugin:node/recommended"
     ],
     "settings": {
       "node": {
