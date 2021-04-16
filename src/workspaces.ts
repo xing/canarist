@@ -12,6 +12,16 @@ const hasKey = <K extends string>(
   return typeof object === 'object' && object !== null && key in object;
 };
 
+const getWorkspacesPackages = ({ workspaces }: PackageJSON): string[] => {
+  const packages = Array.isArray(workspaces)
+    ? workspaces
+    : workspaces && Array.isArray(workspaces.packages)
+    ? workspaces.packages
+    : [];
+
+  return packages;
+};
+
 export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
     manifest: PackageJSON;
@@ -27,11 +37,12 @@ export function collectWorkspaces(config: Config): WorkspacesConfig {
         'utf8'
       )
     );
+    const packages = getWorkspacesPackages(manifest);
 
     return {
       ...repo,
       manifest,
-      packages: (manifest.workspaces || [])
+      packages: packages
         .map((pattern: string) => {
           return glob
             .sync(join(repo.directory, pattern, 'package.json'), {
@@ -57,12 +68,7 @@ export function collectWorkspaces(config: Config): WorkspacesConfig {
 
 export function createRootManifest(config: WorkspacesConfig): PackageJSON {
   const workspaces = config.repositories.reduce((accumulator, repository) => {
-    const { workspaces } = repository.manifest;
-    const packages = Array.isArray(workspaces)
-      ? workspaces
-      : workspaces && Array.isArray(workspaces.packages)
-      ? workspaces.packages
-      : [];
+    const packages = getWorkspacesPackages(repository.manifest);
 
     return [
       ...accumulator,

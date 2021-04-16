@@ -101,7 +101,7 @@ function globSyncMock(pattern: string): string[] {
         '/some/directory/hops/packages/package-2/package.json',
       ];
     case 'nohoist/packages/*/package.json':
-      return ['/some/directory/hops/packages/pkg-1/package.json'];
+      return ['/some/directory/nohoist/packages/pkg-1/package.json'];
   }
   return [];
 }
@@ -151,6 +151,10 @@ describe('collectWorkspaces', () => {
             url: 'https://github.com/xing/hops.git',
             directory: 'hops',
           }),
+          partialRepositoryConfig({
+            url: 'https://github.com/xing/nohoist.git',
+            directory: 'nohoist',
+          }),
         ],
       })
     );
@@ -169,6 +173,12 @@ describe('collectWorkspaces', () => {
         {
           path: '/some/directory/hops/packages/package-2/package.json',
           manifest: hopsPackage2Manifest,
+        },
+      ],
+      [
+        {
+          path: '/some/directory/nohoist/packages/pkg-1/package.json',
+          manifest: nohoistPkg1,
         },
       ],
     ]);
