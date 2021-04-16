@@ -22,6 +22,19 @@ const getWorkspacesPackages = ({ workspaces }: PackageJSON): string[] => {
   return packages;
 };
 
+const resolveFilePackagePath = (
+  packageValue: string,
+  repoDirectory: string
+): string => {
+  if (!packageValue.startsWith('file:')) {
+    return packageValue;
+  }
+
+  const packagePath = packageValue.replace('file:', '');
+
+  return `file:${join(repoDirectory, packagePath)}`;
+};
+
 export interface WorkspacesConfig extends Config {
   repositories: (Config['repositories'][0] & {
     manifest: PackageJSON;
@@ -104,8 +117,11 @@ export function createRootManifest(config: WorkspacesConfig): PackageJSON {
         }
       );
     }
-    return resolutions;
-  }, {});
+    return Object.entries(resolutions).reduce((accumulator, [k, v]) => {
+      accumulator[k] = resolveFilePackagePath(v, repo.directory);
+      return accumulator;
+    }, {} as Record<string, string>);
+  }, {} as Record<string, string>);
 
   return mergeWith(
     {

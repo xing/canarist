@@ -220,6 +220,25 @@ describe('createRootManifest', () => {
     });
   });
 
+  it('should resolve file packages in resolutions', () => {
+    const manifest = createRootManifest(
+      partialWorkspacesConfig({
+        repositories: [
+          partialWorkspacesRepositoryConfig({
+            url: 'https://github.com/xing/hops.git',
+            directory: 'hops',
+            manifest: {
+              ...hopsManifest,
+              resolutions: { stub: 'file:lib/stub' },
+            },
+          }),
+        ],
+      })
+    );
+
+    expect(manifest.resolutions?.stub).toBe('file:hops/lib/stub');
+  });
+
   it('should merge workspaces of root manifests', () => {
     const manifest = createRootManifest(
       partialWorkspacesConfig({
