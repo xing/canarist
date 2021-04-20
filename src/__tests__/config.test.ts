@@ -57,8 +57,7 @@ describe('normalize config', () => {
           null
         );
       }).toThrow(/CANARIST_ENCRYPTION_KEY is not 64 hex characters/);
-
-      process.env.CANARIST_ENCRYPTION_KEY = undefined;
+      expect(process.env.CANARIST_ENCRYPTION_KEY).toBeUndefined();
     });
 
     it('should decrypt encrypted repository url', () => {
@@ -83,8 +82,43 @@ describe('normalize config', () => {
           commands: ['yarn test'],
         },
       ]);
+      expect(process.env.CANARIST_ENCRYPTION_KEY).toBeUndefined();
+    });
 
-      process.env.CANARIST_ENCRYPTION_KEY = undefined;
+    it('should decrypt multiple encrypted repository urls', () => {
+      process.env.CANARIST_ENCRYPTION_KEY =
+        'C7DA20FEF7B7E363043C75F7D580A86E3997F0A58A15F9977814F310835DC2FB';
+      // $ canarist \
+      //     -r enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU= \
+      //     -r enc:G6VSEW8lxBM3OYn7E3k4yFqBFSFyOES9CkxvTzF+b7M=
+      const config = normalizeConfig(
+        {
+          _: [],
+          help: false,
+          clean: true,
+          repository: [
+            'enc:G6VSEW8lxBM3OYn7E3k4yGH61ExqKxx/rsUtKS/h8GU=',
+            'enc:G6VSEW8lxBM3OYn7E3k4yFqBFSFyOES9CkxvTzF+b7M=',
+          ],
+        },
+        null
+      );
+
+      expect(config.repositories).toEqual<Config['repositories']>([
+        {
+          url: 'https://github.com/a/repo.git',
+          branch: 'master',
+          directory: 'repo',
+          commands: ['yarn test'],
+        },
+        {
+          url: 'https://github.com/b/repo.git',
+          branch: 'master',
+          directory: 'repo',
+          commands: ['yarn test'],
+        },
+      ]);
+      expect(process.env.CANARIST_ENCRYPTION_KEY).toBeUndefined();
     });
 
     it('should normalize arguments for multiple repositories', () => {

@@ -83,19 +83,17 @@ function tryParse(input: string): Record<string, unknown> {
  * Note: We're using -nosalt and an iv value of 0 here, because we don't care if
  * two identical URLs create the same output.
  */
-function decryptUrl(input: string): string {
+function decryptUrl(input: string, keyString: string): string {
   const prefix = 'enc:';
   if (!input.startsWith(prefix)) {
     return input;
   }
 
-  const keyString = `${process.env.CANARIST_ENCRYPTION_KEY}`;
   if (!/^[0-9a-fA-F]{64}$/.test(keyString)) {
     throw new Error(`CANARIST_ENCRYPTION_KEY is not 64 hex characters`);
   }
 
   const key = Buffer.from(keyString, 'hex');
-  delete process.env.CANARIST_ENCRYPTION_KEY;
 
   const decipher = createDecipheriv('aes-256-cbc', key, Buffer.alloc(16, 0));
 
@@ -106,13 +104,14 @@ function decryptUrl(input: string): string {
 }
 
 function normalizeRepository(
-  input: string | RepositoryArguments | Partial<RepositoryConfig>
+  input: string | RepositoryArguments | Partial<RepositoryConfig>,
+  keyString: string
 ): RepositoryConfig {
   const defaultBranch = 'master';
   const defaultCommands = ['yarn test'];
 
   if (typeof input === 'string') {
-    const url = decryptUrl(input);
+    const url = decryptUrl(input, keyString);
     const { name } = gitUrlParse(url);
     return {
       url,
@@ -125,7 +124,8 @@ function normalizeRepository(
   const url = decryptUrl(
     Array.isArray((input as RepositoryArguments)._)
       ? (input as RepositoryArguments)._[0]
-      : input.url
+      : input.url,
+    keyString
   );
   const { name } = gitUrlParse(url);
   const directory =
@@ -207,23 +207,38 @@ export function normalizeConfig(
       ((isSingleConfig(config.config) && config.config.yarnArguments) ||
         (project && project.yarnArguments))) ||
     '';
+  const keyString = `${process.env.CANARIST_ENCRYPTION_KEY}`;
+
+  delete process.env.CANARIST_ENCRYPTION_KEY;
 
   if (typeof argv.repository === 'string') {
-    repositories.push(normalizeRepository(argv.repository));
+    repositories.push(normalizeRepository(argv.repository, keyString));
   } else if (Array.isArray(argv.repository)) {
-    repositories.push(...argv.repository.map(normalizeRepository));
+    repositories.push(
+      ...argv.repository.map((repository) =>
+        normalizeRepository(repository, keyString)
+      )
+    );
   } else if (argv.project && config && isProjectsConfig(config.config)) {
     /* istanbul ignore else */ // this can't happen because of the checks at the
     // beginning of this function
     if (project) {
-      repositories.push(...project.repositories.map(normalizeRepository));
+      repositories.push(
+        ...project.repositories.map((repository) =>
+          normalizeRepository(repository, keyString)
+        )
+      );
     }
     // we can safely ignore the missing else case, because of the checks above
   } /* istanbul ignore else */ else if (
     config &&
     isSingleConfig(config.config)
   ) {
-    repositories.push(...config.config.repositories.map(normalizeRepository));
+    repositories.push(
+      ...config.config.repositories.map((repository) =>
+        normalizeRepository(repository, keyString)
+      )
+    );
   }
 
   return {
