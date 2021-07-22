@@ -4,9 +4,7 @@ import { existsSync } from 'fs';
 // eslint-disable-next-line node/no-missing-require
 const pathToBin = require.resolve('canarist/dist/bin.js');
 
-function canarist(
-  ...args: string[]
-): {
+function canarist(...args: string[]): {
   exitCode: number;
   stdout: string;
   stderr: string;

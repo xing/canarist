@@ -180,12 +180,14 @@ export function alignWorkspaceVersions(
   );
 
   return packages.map((pkg) => {
-    ([
-      'dependencies',
-      'devDependencies',
-      'peerDependencies',
-      'optionalDependencies',
-    ] as const).forEach((type) => {
+    (
+      [
+        'dependencies',
+        'devDependencies',
+        'peerDependencies',
+        'optionalDependencies',
+      ] as const
+    ).forEach((type) => {
       const names = Object.keys(pkg.manifest[type] || {});
       names.forEach((name) => {
         const dependencies = pkg.manifest[type];

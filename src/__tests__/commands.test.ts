@@ -82,11 +82,7 @@ describe('command execution', () => {
     it('should output debug messages when debugging is enabled', () => {
       const debug = jest.fn();
 
-      const result = execute(
-        'true',
-        '/dev/null',
-        (debug as unknown) as Debugger
-      );
+      const result = execute('true', '/dev/null', debug as unknown as Debugger);
 
       expect(result).toBe(true);
       expect(execSync).toHaveBeenCalledWith('true', {
@@ -285,7 +281,7 @@ describe('command execution', () => {
             }),
           ],
         }),
-        (debug as unknown) as Debugger
+        debug as unknown as Debugger
       );
 
       expect(execSync).not.toHaveBeenCalled();
