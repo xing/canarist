@@ -44,6 +44,7 @@ export function cloneRepositories(
       `git clone ${url} ${target}`,
       `--single-branch`,
       `--no-tags`,
+      '--quiet',
       branch ? `--branch ${branch}` : '',
       isLocalFilePath ? '' : '--depth 1',
     ]

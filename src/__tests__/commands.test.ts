@@ -126,6 +126,7 @@ describe('command execution', () => {
           'git clone https://github.com/xing/canarist.git /some/directory/canarist',
           '--single-branch',
           '--no-tags',
+          '--quiet',
           '--branch master',
           '--depth 1',
         ].join(' '),
@@ -156,6 +157,7 @@ describe('command execution', () => {
           'git clone https://github.com/xing/canarist.git /some/directory/canarist',
           '--single-branch',
           '--no-tags',
+          '--quiet',
           '--branch master',
           '--depth 1',
         ].join(' '),
@@ -168,6 +170,7 @@ describe('command execution', () => {
           'git clone . /some/directory/canarist',
           '--single-branch',
           '--no-tags',
+          '--quiet',
           '--branch master',
         ].join(' '),
         { stdio: 'pipe', cwd: '/cwd' }
@@ -193,6 +196,7 @@ describe('command execution', () => {
           'git clone . /some/directory/canarist',
           '--single-branch',
           '--no-tags',
+          '--quiet',
         ].join(' '),
         { stdio: 'pipe', cwd: '/cwd' }
       );
