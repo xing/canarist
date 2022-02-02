@@ -9,6 +9,7 @@ type ExecSyncError = SpawnSyncReturns<Buffer> & ExecException;
 export function execute(
   command: string,
   cwd: string,
+  env: NodeJS.ProcessEnv = process.env,
   debug?: Debugger
 ): boolean {
   debug && debug('running command: "%s" in "%s"', command, cwd);
@@ -17,6 +18,7 @@ export function execute(
     execSync(command, {
       stdio: debug ? 'inherit' : 'pipe',
       cwd,
+      env,
     });
 
     debug && debug('done');
@@ -58,7 +60,7 @@ export function cloneRepositories(
         branch ? '#' + branch : ''
       }" into "${target}"`
     );
-    if (!execute(command, cwd, debug)) {
+    if (!execute(command, cwd, process.env, debug)) {
       throw new Error('Failed to clone repositories');
     }
   });
@@ -68,7 +70,7 @@ export function yarn(config: Config, debug?: Debugger): void {
   const command = `yarn ${config.yarnArguments}`.trim();
 
   console.log('[canarist] installing dependencies with yarn');
-  if (!execute(command, config.targetDirectory, debug)) {
+  if (!execute(command, config.targetDirectory, process.env, debug)) {
     throw new Error('Failed to install dependencies');
   }
 }
@@ -84,7 +86,7 @@ export function executeCommands(config: Config, debug?: Debugger): void {
       const cwd = join(config.targetDirectory, repo.directory);
 
       console.log('[canarist] executing command "%s" in "%s"', command, cwd);
-      if (!execute(command, cwd, debug)) {
+      if (!execute(command, cwd, process.env, debug)) {
         throw new Error('Failed to run configured commands');
       }
     });

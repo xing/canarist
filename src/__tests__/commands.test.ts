@@ -85,6 +85,7 @@ describe('command execution', () => {
       const result = execute(
         'true',
         '/dev/null',
+        process.env,
         (debug as unknown) as Debugger
       );
 
