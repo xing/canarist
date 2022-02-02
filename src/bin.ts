@@ -114,7 +114,7 @@ function invokeCLI(argv: string[]): Config {
   try {
     return normalizeConfig(args, config);
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error:', error instanceof Error ? error.message : error);
     printUsage();
     // eslint-disable-next-line no-process-exit
     process.exit(1);
@@ -177,5 +177,8 @@ try {
   }
 } catch (err) {
   process.exitCode = 1;
-  console.error('[canarist] exited with error "%s"', err.message);
+  console.error(
+    '[canarist] exited with error "%s"',
+    err instanceof Error ? err.message : err
+  );
 }

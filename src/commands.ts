@@ -1,8 +1,10 @@
-import { execSync } from 'child_process';
+import { SpawnSyncReturns, ExecException, execSync } from 'child_process';
 import { join } from 'path';
 import type { Debugger } from 'debug';
 import type { Config } from './config';
 import gitUrlParse from 'git-url-parse';
+
+type ExecSyncError = SpawnSyncReturns<Buffer> & ExecException;
 
 export function execute(
   command: string,
@@ -22,8 +24,8 @@ export function execute(
     return true;
   } catch (error) {
     console.error('[canarist] command "%s" failed in "%s"!', command, cwd);
-    if (error.stderr) {
-      console.error(error.stderr.toString('utf-8').trim());
+    if ((error as ExecSyncError).stderr) {
+      console.error((error as ExecSyncError).stderr.toString('utf-8').trim());
     }
 
     return false;
