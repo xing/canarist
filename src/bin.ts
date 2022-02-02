@@ -20,6 +20,12 @@ import {
 const isDebug = process.env.DEBUG && process.env.DEBUG.includes('canarist');
 const debug = isDebug ? createDebug('canarist') : undefined;
 
+for (const key of Object.keys(process.env)) {
+  if (key.startsWith('npm_')) {
+    delete process.env[key];
+  }
+}
+
 const minimistConfig: Opts = {
   alias: {
     help: ['h'],
