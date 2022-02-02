@@ -88,7 +88,7 @@ describe('command execution', () => {
         'true',
         '/dev/null',
         process.env,
-        (debug as unknown) as Debugger
+        debug as unknown as Debugger
       );
 
       expect(result).toBe(true);
@@ -296,7 +296,7 @@ describe('command execution', () => {
             }),
           ],
         }),
-        (debug as unknown) as Debugger
+        debug as unknown as Debugger
       );
 
       expect(execSync).not.toHaveBeenCalled();

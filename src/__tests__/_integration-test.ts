@@ -1,12 +1,12 @@
-import { execSync } from 'child_process';
+import { ExecException, execSync, SpawnSyncReturns } from 'child_process';
 import { existsSync } from 'fs';
+
+type ExecSyncError = SpawnSyncReturns<Buffer> & ExecException;
 
 // eslint-disable-next-line node/no-missing-require
 const pathToBin = require.resolve('canarist/dist/bin.js');
 
-function canarist(
-  ...args: string[]
-): {
+function canarist(...args: string[]): {
   exitCode: number;
   stdout: string;
   stderr: string;
@@ -23,9 +23,9 @@ function canarist(
     };
   } catch (error) {
     return {
-      exitCode: error.status,
-      stdout: error.stdout.toString(),
-      stderr: error.stderr.toString(),
+      exitCode: (error as ExecSyncError).status || 0,
+      stdout: (error as ExecSyncError).stdout.toString(),
+      stderr: (error as ExecSyncError).stderr.toString(),
     };
   }
 }
