@@ -110,10 +110,10 @@
     ]
   },
   "dependencies": {
-    "cosmiconfig": "^7.0.0",
-    "debug": "^4.1.1",
-    "fast-glob": "^3.2.2",
-    "git-url-parse": "^11.1.2",
+    "cosmiconfig": "^7.0.1",
+    "debug": "^4.3.3",
+    "fast-glob": "^3.2.11",
+    "git-url-parse": "^11.6.0",
     "lodash.mergewith": "^4.6.2",
     "minimist": "^1.2.5",
     "rimraf": "^3.0.2"
