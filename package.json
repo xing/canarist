@@ -13,12 +13,8 @@
     "posttest": "yarn test:integration",
     "pretest:integration": "yarn build",
     "test:integration": "jest --config '{\"preset\":\"ts-jest\"}' src/__tests__/_integration-test.ts",
-    "fmt": "prettier --write --ignore-path .gitignore '**/*.{ts,md}'"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "fmt": "prettier --write --ignore-path .gitignore '**/*.{ts,md}'",
+    "prepare": "husky install"
   },
   "lint-staged": {
     ".{ts,md}": [
@@ -132,7 +128,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^4.2.5",
+    "husky": "^7.0.4",
     "jest": "^27.4.7",
     "jest-runner-eslint": "^1.0.0",
     "lint-staged": "^11.0.0",
