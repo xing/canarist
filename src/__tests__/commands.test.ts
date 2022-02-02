@@ -31,6 +31,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('true', {
         stdio: 'pipe',
         cwd: '/dev/null',
+        env: expect.any(Object),
       });
     });
 
@@ -46,6 +47,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('false', {
         stdio: 'pipe',
         cwd: '/dev/null',
+        env: expect.any(Object),
       });
 
       expect(spy).toHaveBeenCalledTimes(1);
@@ -93,6 +95,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('true', {
         stdio: 'inherit',
         cwd: '/dev/null',
+        env: expect.any(Object),
       });
 
       expect(debug).toHaveBeenCalledTimes(2);
@@ -131,7 +134,7 @@ describe('command execution', () => {
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/cwd' }
+        { stdio: 'pipe', cwd: '/cwd', env: expect.any(Object) }
       );
     });
 
@@ -162,7 +165,7 @@ describe('command execution', () => {
           '--branch master',
           '--depth 1',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/cwd' }
+        { stdio: 'pipe', cwd: '/cwd', env: expect.any(Object) }
       );
 
       expect(execSync).toHaveBeenNthCalledWith(
@@ -174,7 +177,7 @@ describe('command execution', () => {
           '--quiet',
           '--branch master',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/cwd' }
+        { stdio: 'pipe', cwd: '/cwd', env: expect.any(Object) }
       );
     });
 
@@ -199,7 +202,7 @@ describe('command execution', () => {
           '--no-tags',
           '--quiet',
         ].join(' '),
-        { stdio: 'pipe', cwd: '/cwd' }
+        { stdio: 'pipe', cwd: '/cwd', env: expect.any(Object) }
       );
     });
 
@@ -231,6 +234,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('yarn', {
         stdio: 'pipe',
         cwd: '/some/directory',
+        env: expect.any(Object),
       });
     });
 
@@ -240,6 +244,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('yarn --production=false', {
         stdio: 'pipe',
         cwd: '/some/directory',
+        env: expect.any(Object),
       });
     });
 
@@ -275,6 +280,7 @@ describe('command execution', () => {
       expect(execSync).toHaveBeenCalledWith('yarn test', {
         stdio: 'pipe',
         cwd: '/some/directory/canarist',
+        env: expect.any(Object),
       });
     });
 
