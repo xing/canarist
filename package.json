@@ -106,7 +106,7 @@
     ]
   },
   "dependencies": {
-    "cosmiconfig": "^7.0.1",
+    "cosmiconfig": "^8.0.0",
     "debug": "^4.3.3",
     "fast-glob": "^3.2.11",
     "git-url-parse": "^11.6.0",
