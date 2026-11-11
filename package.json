@@ -121,7 +121,7 @@
     "@types/lodash.mergewith": "^4.6.6",
     "@types/minimist": "^1.2.2",
     "@types/node": "^20.0.0",
-    "@types/rimraf": "^3.0.2",
+    "@types/rimraf": "^4.0.0",
     "@typescript-eslint/eslint-plugin": "^5.10.2",
     "@typescript-eslint/parser": "^5.10.2",
     "eslint": "^8.8.0",
